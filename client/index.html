@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>0.0.1</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <section class="vh-100">
+        <div class="container h-100">
+
+            <div id="menu" class="h-100">
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 w-80 m-auto">
+                    <h3 class="mb-5">0.0.1</h3>
+                    <p class="mb-5">Online players : <span id="onlinePlayersCount">0</span></p>
+                    <div class="input-group mb-5">
+                        <span class="input-group-text" id="basic-addon3">Enter a room ID</span>
+                        <input type="text" class="form-control" id="roomID" placeholder="roomID">
+                        <input type="text" class="form-control" id="pseudo2" placeholder="pseudo">
+                        <button class="btn btn-outline-primary" type="button" id="joinGame">Join existing game!</button>
+                    </div>
+                    <div class="input-group mb-5">
+                        <span class="input-group-text" id="basic-addon3">Enter your pseudo</span>
+                        <input type="text" class="form-control" id="pseudo">
+                        <button class="btn btn-success" type="button" id="createGame">Create a new game!</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="room" class="h-100">
+                <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                    <h3>Your room ID is: <span id="roomCode"></span></h3>
+                    <p class="mb-5">Players in the room : <span id="roomPlayersCount">0</span></p>
+                    <canvas id="canvas"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Classes -->
+    <script src="classes/Room.js"></script>
+    <script src="classes/Player.js"></script>
+    <script src="classes/Client.js"></script>
+    <!-- End::Classes-->
+
+    <script src="node_modules/socket.io-client/dist/socket.io.min.js"></script>
+    <script src="client.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

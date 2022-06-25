@@ -46,7 +46,28 @@ class Game {
         // Updates state
         this.updateState(state);
 
+        // Binds click on canvas
+        var canvas = this.canvas;        
+        canvas.onmousedown = function(e){
+            const rect = canvas.getBoundingClientRect()
+            const x = e.clientX - rect.left
+            const y = e.clientY - rect.top
+            this.player.mouseClicked = {
+                x: x,
+                y: y
+            }
+        }
+        canvas.onmouseup = function(e){
+            this.player.mouseClicked = false
+        }
 
+        // Binds keypress
+        window.addEventListener("keydown", function(){
+            this.player.keydown = true
+        }, false);
+        window.addEventListener("keyup", function(){
+            this.player.keydown = false
+        }, false);
 
         // Game loop animation
         var that = this;
@@ -56,26 +77,17 @@ class Game {
             // Clear screen
             that.clear()
             // Always update mouse position
-            //game.updateMousePosition()
-            // Update current player
-            //state.currentPlayer = state.players[state.currentPlayerID];
-
-            // Draws gray rectangle on back of canvas
-            that.drawBackground();
-            
+            that.updateMousePosition()
+            // Draws grey rectangle on back of canvas
+            that.drawBackground();            
             // Draws tiles
             that.drawFloor();
-
             // Play current step
             that.steps[that.state.currentStep]()
-
             // Reset global alpha
             that.ctx.globalAlpha = 1; 
         }
         animate();
-
-        
-        
     }
 
     clear() {
@@ -139,6 +151,27 @@ class Game {
             this.player.territory.height * this.state.CONSTANTS.TILE_SIZE - 2 // height
         ); 
         this.ctx.stroke();
+    }
+
+    // Update mouse coordinates
+    updateMousePosition()
+    {   
+        var x = 0;
+        var y = 0;
+
+        // Get mouse position
+        this.canvas.onmousemove = function(e) {
+
+            // Correct mouse position
+            var rect = this.getBoundingClientRect();
+            x = e.clientX - rect.left;
+            y = e.clientY - rect.top;
+
+            // Update state
+            this.player.mousePosition.x = x;
+            this.player.mousePosition.y = y;
+        
+        };
     }
 
  

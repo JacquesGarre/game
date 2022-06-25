@@ -29,12 +29,20 @@ class Client {
 
         // When client has to init player
         this.io.on("initPlayer", (playerParams) => {
-
-            console.log('initializing player! ' + playerParams)
-
             this.player = new Player(this, playerParams);
             this.room.addPlayer(this.player)
             this.room.enter();
+        });
+
+        // When client has to load game
+        this.io.on("loadGame", (state) => {
+            this.game = new Game(this.room, this.io, this.player, state);
+            this.game.load();
+        });
+
+        // When client has to start game / update state
+        this.io.on("updateState", (state) => {
+            this.game.loop(state);
         });
 
     }

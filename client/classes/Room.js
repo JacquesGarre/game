@@ -20,16 +20,10 @@ class Room {
         const initialScreen = document.getElementById('menu')
         const gameScreen = document.getElementById('room')
         const roomIDdisplay = document.getElementById('roomCode')
-        // const canvas = document.getElementById('canvas');
-        // const ctx = canvas.getContext('2d');
 
         initialScreen.style.display = "none";
         gameScreen.style.display = "block";
         roomIDdisplay.innerHTML = this.id;
-       
-        // canvas.width = canvas.height = 600;
-        // ctx.fillStyle = 'black';
-        // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     }
 

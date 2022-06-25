@@ -40,14 +40,21 @@ server.on("connection", (client) => {
         // Make the client joining the room
         client.join(roomID);
 
+        var playerID = 0
+
         // Sets first player
-        client.number = 1;
+        client.number = playerID;
         client.pseudo = pseudo;
         client.emit('initPlayer', {
-            number: 1,
+            number: playerID,
             pseudo: pseudo
         });
 
+        state[roomID].players[playerID] = {
+            number: playerID,
+            pseudo: pseudo
+        };
+        
         // Sends room players count to client
         const clients = server.sockets.adapter.rooms.get(roomID);
         const numClients = clients ? clients.size : 0;
@@ -59,9 +66,12 @@ server.on("connection", (client) => {
     client.on("joinGame", (pseudo, roomID) => {
         clientRooms[client.id] = roomID;
         client.join(roomID);
-        client.number = 2;
+
+        var playerID = 1
+
+        client.number = playerID;
         client.emit('initPlayer', {
-            number: 2,
+            number: playerID,
             pseudo: pseudo
         });
 
@@ -69,11 +79,37 @@ server.on("connection", (client) => {
         const clients = server.sockets.adapter.rooms.get(roomID);
         const numClients = clients ? clients.size : 0;
         server.to(roomID).emit("roomPlayersCount", numClients);
+
+        state[roomID].players[playerID] = {
+            number: playerID,
+            pseudo: pseudo
+        };
+
+        // Load game with initialized state
+        server.to(roomID).emit("loadGame", state[roomID]);
         
     });
 
+    // On game loaded
+    client.on("gameLoaded", (roomID, playerNumber) => {
+        state[roomID].playersLoaded.push(playerNumber);
+        if(state[roomID].playersLoaded.length == CONSTANTS.PLAYERS_COUNT){
+            startGameLoop(client, state, roomID);
+        }
+    })
     
 });
+
+// Game loop interval
+function startGameLoop(client, state, roomID)
+{
+    const interval = setInterval(function(){
+
+        // Updates the state to the room every frame
+        server.to(roomID).emit("updateState", state[roomID]);
+
+    }, 1000 / CONSTANTS.FPS);
+}
 
 // Listen on port 3000
 server.listen(3000);

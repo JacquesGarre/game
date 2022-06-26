@@ -204,14 +204,14 @@ class Game {
                 // if it's a zone already
                 if(existingZone){
 
-                    // TODOOOOO
-
-
                     // remove zone from state
-                    // this.state.zones = this.state.zones.filter((zone) => zone.x !== existingZone.x && zone.y !== existingZone.y && zone.owner !== existingZone.owner);
+                    const index = this.state.zones.findIndex(zone => {
+                        return zone.x == existingZone.x && zone.y == existingZone.y && zone.owner == existingZone.owner;
+                    });
+                    this.state.zones.splice(index, 1);
 
-                    // // increments player resources
-                    // this.player.resources.zones++;
+                    // increments player resources
+                    this.player.resources.zones++;
 
                 // else push zone
                 } else if(this.player.resources.zones > 0) {
@@ -225,7 +225,7 @@ class Game {
                     });
 
                     // decrements player resources
-                    this.player.resources.zones -= 1;
+                    this.player.resources.zones--;
                 }
 
                 // Tells server to update state for everybody

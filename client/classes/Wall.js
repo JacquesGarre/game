@@ -1,6 +1,6 @@
 class Wall {
 
-    constructor(sprites, state, ctx, x, y, size)
+    constructor(sprites, state, ctx, x, y, size, sprite = '')
     {
         this.x = x;
         this.y = y;
@@ -8,7 +8,12 @@ class Wall {
         this.ctx = ctx;
         this.state = state;
         this.sprites = sprites;
-        this.sprite = this.sprites[this.getSprite()];
+        if(sprite == ''){
+            this.sprite = this.sprites[this.getSprite()];
+        } else {
+            this.sprite = this.sprites[sprite];
+        }
+        
     }
 
     draw()
@@ -17,6 +22,9 @@ class Wall {
         if(this.state.CONSTANTS.DEBUG){
             this.drawBorders();
         }
+
+ 
+        console.log(this.sprite)
 
         // Draw sprite
         this.ctx.drawImage(

@@ -137,7 +137,7 @@ class Game {
     drawWalls()
     {
         for(const params of this.state.walls){
-            var wall = new Wall(this.sprites, this.state, this.ctx, params.x, params.y, params.size);
+            var wall = new Wall(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.sprite);
             wall.draw();       
         }
     }
@@ -181,7 +181,7 @@ class Game {
         }
 
         // Draw hover effect only if mouseposition is over a wall
-        const [tileX, tileY] = this.getHoveredTile();
+        var [tileX, tileY] = this.getHoveredTile();
         if(this.state.tiles[tileX] !== undefined && this.state.tiles[tileX][tileY] !== undefined){
 
             const hoveredTile = this.state.tiles[tileX][tileY];
@@ -219,11 +219,20 @@ class Game {
 
                         this.state.tiles[tileX][tileY].type = 'wall';
 
+                        // push zone to state
+                        this.state.walls.push(this.state.tiles[tileX][tileY]);
+
                         // increments player resources
                         this.player.resources.doors++;
 
                     // else push zone
                     } else if(this.player.resources.doors > 0) {
+
+                        // remove door from walls
+                        const index = this.state.walls.findIndex(wall => {
+                            return wall.x == tileX && wall.y == tileY && wall.owner == this.player.number;
+                        });
+                        this.state.walls.splice(index, 1);
 
                         // push zone to state
                         this.state.doors.push({

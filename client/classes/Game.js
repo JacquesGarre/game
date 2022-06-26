@@ -17,9 +17,18 @@ class Game {
             'zoneDrawing': function(){ 
                 that.zoneDrawing(); // players will draw their zone
             },
+            'kingsDrawing': function(){ 
+                that.kingsDrawing(); // players will draw their kings
+            },
+            'soldiersDrawing': function(){ 
+                that.soldiersDrawing(); // players will draw their soldiers
+            },
             'doorsDrawing': function(){ 
                 that.doorsDrawing(); // players will draw their doors
-            }
+            },
+            'soldiersMoves': function(){ 
+                that.soldiersMoves(); // players will draw their doors
+            },
         }
     }
 
@@ -94,6 +103,10 @@ class Game {
             that.drawWalls();
             // Draws doors
             that.drawDoors();
+            // Draws kings
+            that.drawKings();
+            // Draws soldiers
+            that.drawSoldiers();
             // Play current step
             that.steps[that.state.currentStep]()
             // Reset global alpha
@@ -104,10 +117,10 @@ class Game {
 
     clear() {
         this.ctx.clearRect(            
-            this.state.canvas.xOffset, 
-            this.state.canvas.yOffset,
-            this.state.tiles.length * this.state.CONSTANTS.TILE_SIZE,
-            this.state.tiles[0].length * this.state.CONSTANTS.TILE_SIZE
+            0, 
+            0,
+            this.canvas.width,
+            this.canvas.height
         );
     }
 
@@ -158,27 +171,68 @@ class Game {
         }
     }
 
+    drawKings()
+    {
+        for(const params of this.state.kings){
+            var king = new King(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner);
+            king.draw();
+        }
+    }
+
+    drawSoldiers()
+    {
+        for(const params of this.state.soldiers){
+            var soldier = new Soldier(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner, params.health, params.energy);
+            soldier.draw();
+        }
+    }
+
+
     updateState(state)
     {
         this.state = state;
         this.state.players[this.player.number] = {
             number: this.player.number, 
             pseudo: this.player.pseudo,
-            resources: {
-                zones: this.player.resources.zones,
-                doors: this.player.resources.doors
+            resources: this.player.resources,
+            finishedMoves: this.player.finishedMoves
+        }
+    }
+
+    soldiersMoves()
+    {   
+        // If players presse a key, he finished his turn
+        if(this.player.keydown){
+            this.player.finishedMoves = true;
+            this.updateState(this.state);
+            this.io.emit("stateUpdated", this.room.id, this.state);
+        }
+
+        var [tileX, tileY] = this.getHoveredTile();
+
+        if(this.state.tiles[tileX] !== undefined && this.state.tiles[tileX][tileY] !== undefined){
+            const hoveredTile = this.state.tiles[tileX][tileY];
+            if(this.player.isHoveringOneOfHisSoldiers(hoveredTile, this.state)){
+
+                var params = this.player.getSoldier(hoveredTile, this.state);
+
+                // Display hover effect over soldier
+                var soldier = new Soldier(this.sprites, this.state, this.ctx, tileX, tileY, this.state.CONSTANTS.TILE_SIZE, this.player.number, params.health, params.energy);
+                soldier.drawHoverEffect();
+
+                if(this.player.mouseClicked !== false){
+
+
+                }
+
+
             }
         }
+
     }
 
     doorsDrawing()
     {   
-        // Init walls if they are not inited
-        if(!this.state.walls.length){
-            this.initWalls();
-            this.updateState(this.state);
-            this.io.emit("stateUpdated", this.room.id, this.state);
-        }
 
         // Draw hover effect only if mouseposition is over a wall
         var [tileX, tileY] = this.getHoveredTile();
@@ -240,13 +294,172 @@ class Game {
                             y: tileY,
                             size: this.state.CONSTANTS.TILE_SIZE,
                             owner: this.player.number, 
-                            sprite: sprite
+                            sprite: sprite,
+                            health: this.state.CONSTANTS.DOOR_HEALTH
                         });
 
                         this.state.tiles[tileX][tileY].type = 'door';
 
                         // decrements player resources
                         this.player.resources.doors--;
+                    }
+
+                    // Tells server to update state for everybody
+                    this.updateState(this.state);
+                    this.io.emit("stateUpdated", this.room.id, this.state);
+
+                }
+
+            }
+
+        }
+        
+
+    }
+
+    soldiersDrawing()
+    {       
+
+        // Draw hover effect only if mouseposition is over a wall
+        var [tileX, tileY] = this.getHoveredTile();
+        if(this.state.tiles[tileX] !== undefined && this.state.tiles[tileX][tileY] !== undefined){
+
+            const hoveredTile = this.state.tiles[tileX][tileY];
+
+            var existingKing = false;
+            for(var king of this.state.kings){
+                if(king.x == tileX && king.y == tileY && king.owner == this.player.number){
+                    existingKing = king;
+                    break;
+                }
+            }
+
+            if(this.player.isHoveringOneOfHisZones(hoveredTile) && !existingKing){
+
+                var soldier = new Soldier(this.sprites, this.state, this.ctx, tileX, tileY, this.state.CONSTANTS.TILE_SIZE, this.player.number, this.state.CONSTANTS.SOLDIER_HEALTH, this.state.CONSTANTS.SOLDIER_ENERGY);
+                if(this.player.resources.soldiers > 0){
+                    // Draw door on hover
+                    soldier.draw();
+                }
+
+                // If player clicks
+                if(this.player.mouseClicked !== false){
+
+                    // Only 1 click;
+                    this.player.mouseClicked = false;
+
+                    var existingSoldier = false;
+                    for(var soldier of this.state.soldiers){
+                        if(soldier.x == tileX && soldier.y == tileY && soldier.owner == this.player.number){
+                            existingSoldier = soldier;
+                            break;
+                        }
+                    }
+
+                    // if it's a zone already
+                    if(existingSoldier){
+
+                        // remove zone from state
+                        const index = this.state.soldiers.findIndex(soldier => {
+                            return soldier.x == existingSoldier.x && soldier.y == existingSoldier.y && soldier.owner == existingSoldier.owner;
+                        });
+                        this.state.soldiers.splice(index, 1);
+
+                        // increments player resources
+                        this.player.resources.soldiers++;
+
+                    // else push zone
+                    } else if(this.player.resources.soldiers > 0) {
+
+                        // push zone to state
+                        this.state.soldiers.push({
+                            x: tileX,
+                            y: tileY,
+                            size: this.state.CONSTANTS.TILE_SIZE,
+                            owner: this.player.number,
+                            health: this.state.CONSTANTS.SOLDIER_HEALTH,
+                            energy: this.state.CONSTANTS.SOLDIER_ENERGY,
+                        });
+
+                        // decrements player resources
+                        this.player.resources.soldiers--;
+                    }
+
+                    // Tells server to update state for everybody
+                    this.updateState(this.state);
+                    this.io.emit("stateUpdated", this.room.id, this.state);
+
+                }
+
+            }
+
+        }
+        
+
+    }
+
+    kingsDrawing()
+    {       
+        // Init walls if they are not inited
+        if(!this.state.walls.length){
+            this.initWalls();
+            this.updateState(this.state);
+            this.io.emit("stateUpdated", this.room.id, this.state);
+        }
+
+        // Draw hover effect only if mouseposition is over a wall
+        var [tileX, tileY] = this.getHoveredTile();
+        if(this.state.tiles[tileX] !== undefined && this.state.tiles[tileX][tileY] !== undefined){
+
+            const hoveredTile = this.state.tiles[tileX][tileY];
+            if(this.player.isHoveringOneOfHisZones(hoveredTile)){
+
+                var king = new King(this.sprites, this.state, this.ctx, tileX, tileY, this.state.CONSTANTS.TILE_SIZE, this.player.number);
+                if(this.player.resources.kings > 0){
+                    // Draw door on hover
+                    king.draw();
+                }
+
+                // If player clicks
+                if(this.player.mouseClicked !== false){
+
+                    // Only 1 click;
+                    this.player.mouseClicked = false;
+
+                    var existingKing = false;
+                    for(var king of this.state.kings){
+                        if(king.x == tileX && king.y == tileY && king.owner == this.player.number){
+                            existingKing = king;
+                            break;
+                        }
+                    }
+
+                    // if it's a zone already
+                    if(existingKing){
+
+                        // remove zone from state
+                        const index = this.state.kings.findIndex(king => {
+                            return king.x == existingKing.x && king.y == existingKing.y && king.owner == existingKing.owner;
+                        });
+                        this.state.kings.splice(index, 1);
+
+                        // increments player resources
+                        this.player.resources.kings++;
+
+                    // else push zone
+                    } else if(this.player.resources.kings > 0) {
+
+                        // push zone to state
+                        this.state.kings.push({
+                            x: tileX,
+                            y: tileY,
+                            size: this.state.CONSTANTS.TILE_SIZE,
+                            owner: this.player.number,
+                            health: this.state.CONSTANTS.KING_HEALTH
+                        });
+
+                        // decrements player resources
+                        this.player.resources.kings--;
                     }
 
                     // Tells server to update state for everybody
@@ -328,6 +541,7 @@ class Game {
                     });
 
                     this.state.tiles[tileX][tileY].type = 'zone';
+                    this.state.tiles[tileX][tileY].owner = this.player.number;
 
                     // decrements player resources
                     this.player.resources.zones--;

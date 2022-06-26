@@ -12,8 +12,12 @@ class Player {
         this.mouseClicked = false
         this.resources = {
             zones: CONSTANTS.RESOURCES_PER_PLAYER.zones,
-            doors: CONSTANTS.RESOURCES_PER_PLAYER.doors
+            doors: CONSTANTS.RESOURCES_PER_PLAYER.doors,
+            kings: CONSTANTS.RESOURCES_PER_PLAYER.kings,
+            soldiers: CONSTANTS.RESOURCES_PER_PLAYER.soldiers
         }
+        this.finishedMoves = false
+        this.keydown = false
     }
 
     setTerritory(state)
@@ -38,5 +42,36 @@ class Player {
         return hoveredTile.type == 'wall' && hoveredTile.owner == this.number && wallsAllowedToDrawDoor.includes(hoveredTile.sprite);
     }
 
+    isHoveringOneOfHisZones(hoveredTile)
+    {
+        return hoveredTile.owner == this.number && hoveredTile.type == 'zone';
+    }
+
+    isHoveringMovableTile(hoveredTile)
+    {
+        return (hoveredTile.type == 'zone' || hoveredTile.type == 'door' || hoveredTile.type == 'floor') // Can move on everything but a wall
+    }
+
+    isHoveringOneOfHisSoldiers(hoveredTile, state)
+    {
+        for(var soldier of state.soldiers){
+            if(soldier.x == hoveredTile.x && soldier.y == hoveredTile.y && soldier.owner == this.number){
+                return true;
+                break;
+            }
+        }
+        return false;
+    }
+
+    getSoldier(hoveredTile, state)
+    {
+        for(var soldier of state.soldiers){
+            if(soldier.x == hoveredTile.x && soldier.y == hoveredTile.y && soldier.owner == this.number){
+                return soldier;
+                break;
+            }
+        }
+        return false;
+    }
 
 }

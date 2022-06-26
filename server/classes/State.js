@@ -27,6 +27,8 @@ class State {
         this.zones = [];
         this.walls = [];
         this.doors = [];
+        this.kings = [];
+        this.soldiers = [];
     }   
     
     initTiles()

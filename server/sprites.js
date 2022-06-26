@@ -60,6 +60,8 @@ const SPRITES = {
     soldier_idle_down_2:'assets/map/characters/soldier/idle_down_2.png',
     soldier_idle_down_3:'assets/map/characters/soldier/idle_down_3.png',
 
+    king: 'assets/map/characters/king/king.png',
+
 }
 
 module.exports = {

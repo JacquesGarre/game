@@ -119,6 +119,24 @@ function checkForNextGameStep(newState)
             newState.currentStep = 'zoneDrawing';
             return newState;
         }
+    }   
+
+    // test kingDrawing
+    for(const playerID of Object.keys(newState.players)){
+        const player = newState.players[playerID];
+        if(player.resources.kings == undefined || player.resources.kings > 0){
+            newState.currentStep = 'kingsDrawing';
+            return newState;
+        }
+    }
+
+    // test soldiersDrawing
+    for(const playerID of Object.keys(newState.players)){
+        const player = newState.players[playerID];
+        if(player.resources.soldiers == undefined || player.resources.soldiers > 0){
+            newState.currentStep = 'soldiersDrawing';
+            return newState;
+        }
     }
 
     // test doorsDrawing
@@ -129,6 +147,18 @@ function checkForNextGameStep(newState)
             return newState;
         }
     }
+
+    // test soldiersMoves
+    for(const playerID of Object.keys(newState.players)){
+        const player = newState.players[playerID];
+        if(!player.finishedMoves){
+            newState.currentStep = 'soldiersMoves';
+            return newState;
+        }
+    }
+
+    console.log('NEXT STEP, ANIMATION!')
+    
 
     return newState;
 

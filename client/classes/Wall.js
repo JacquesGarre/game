@@ -22,10 +22,6 @@ class Wall {
         if(this.state.CONSTANTS.DEBUG){
             this.drawBorders();
         }
-
- 
-        console.log(this.sprite)
-
         // Draw sprite
         this.ctx.drawImage(
             this.sprite, 

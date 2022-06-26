@@ -46,8 +46,11 @@ class Zone {
             var params = tilesAround[key];
             // is wall if is floor and not undefined
             if(params && params.type == 'floor'){
+                var wall = new Wall(this.sprites, this.state, this.ctx, params.x, params.y, this.size)
                 this.state.tiles[params.x][params.y].type = 'wall';
                 this.state.tiles[params.x][params.y].health = this.state.CONSTANTS.WALL_HEALTH;
+                this.state.tiles[params.x][params.y].owner = this.owner;
+                this.state.tiles[params.x][params.y].sprite = wall.getSprite();
                 this.state.walls.push(this.state.tiles[params.x][params.y]);
             }   
         }

@@ -32,5 +32,11 @@ class Player {
             && this.mousePosition.y > this.territory.y && this.mousePosition.y < (this.territory.y+this.territory.height);
     }
 
+    isHoveringOneOfHisWalls(hoveredTile)
+    {   
+        var wallsAllowedToDrawDoor = ['wall_top', 'wall_right', 'wall_left', 'wall_bottom'];
+        return hoveredTile.type == 'wall' && hoveredTile.owner == this.number && wallsAllowedToDrawDoor.includes(hoveredTile.sprite);
+    }
+
 
 }

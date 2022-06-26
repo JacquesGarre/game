@@ -92,6 +92,8 @@ class Game {
             that.drawZones();
             // Draws walls
             that.drawWalls();
+            // Draws doors
+            that.drawDoors();
             // Play current step
             that.steps[that.state.currentStep]()
             // Reset global alpha
@@ -140,6 +142,14 @@ class Game {
         }
     }
 
+    drawDoors()
+    {
+        for(const params of this.state.doors){
+            var door = new Door(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner, params.sprite);
+            door.draw();       
+        }
+    }
+
     drawZones()
     {
         for(const params of this.state.zones){
@@ -163,10 +173,84 @@ class Game {
 
     doorsDrawing()
     {   
+        // Init walls if they are not inited
         if(!this.state.walls.length){
             this.initWalls();
+            this.updateState(this.state);
+            this.io.emit("stateUpdated", this.room.id, this.state);
         }
-        this.drawTerritory();
+
+        // Draw hover effect only if mouseposition is over a wall
+        const [tileX, tileY] = this.getHoveredTile();
+        if(this.state.tiles[tileX] !== undefined && this.state.tiles[tileX][tileY] !== undefined){
+
+            const hoveredTile = this.state.tiles[tileX][tileY];
+            if(this.player.isHoveringOneOfHisWalls(hoveredTile)){
+
+                var sprite = 'door_' + hoveredTile.sprite.split('_')[1];
+                var door = new Door(this.sprites, this.state, this.ctx, tileX, tileY, this.state.CONSTANTS.TILE_SIZE, this.player.number, sprite);
+                if(this.player.resources.doors > 0){
+                    // Draw door on hover
+                    door.draw();
+                }
+
+                // If player clicks
+                if(this.player.mouseClicked !== false){
+
+                    // Only 1 click;
+                    this.player.mouseClicked = false;
+
+                    var existingDoor = false;
+                    for(var door of this.state.doors){
+                        if(door.x == tileX && door.y == tileY && door.owner == this.player.number){
+                            existingDoor = door;
+                            break;
+                        }
+                    }
+
+                    // if it's a zone already
+                    if(existingDoor){
+
+                        // remove zone from state
+                        const index = this.state.doors.findIndex(door => {
+                            return door.x == existingDoor.x && door.y == existingDoor.y && door.owner == existingDoor.owner;
+                        });
+                        this.state.doors.splice(index, 1);
+
+                        this.state.tiles[tileX][tileY].type = 'wall';
+
+                        // increments player resources
+                        this.player.resources.doors++;
+
+                    // else push zone
+                    } else if(this.player.resources.doors > 0) {
+
+                        // push zone to state
+                        this.state.doors.push({
+                            x: tileX,
+                            y: tileY,
+                            size: this.state.CONSTANTS.TILE_SIZE,
+                            owner: this.player.number, 
+                            sprite: sprite
+                        });
+
+                        this.state.tiles[tileX][tileY].type = 'door';
+
+                        // decrements player resources
+                        this.player.resources.doors--;
+                    }
+
+                    // Tells server to update state for everybody
+                    this.updateState(this.state);
+                    this.io.emit("stateUpdated", this.room.id, this.state);
+
+                }
+
+            }
+
+        }
+        
+
     }
 
     initWalls()

@@ -12,7 +12,7 @@ const CONSTANTS = {
     PLAYERS_COUNT: 2,
     RESOURCES_PER_PLAYER: {
         zones: 5,
-        doors: 1
+        doors: 3
     },
     WALL_HEALTH: 3
 }

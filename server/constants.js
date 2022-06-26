@@ -11,9 +11,10 @@ const CONSTANTS = {
     TILE_BORDER_COLOR: 'red',
     PLAYERS_COUNT: 2,
     RESOURCES_PER_PLAYER: {
-        zones: 4,
-        doors: 2
-    }
+        zones: 5,
+        doors: 1
+    },
+    WALL_HEALTH: 3
 }
 
 module.exports = {

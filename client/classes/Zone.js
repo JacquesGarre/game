@@ -27,10 +27,30 @@ class Zone {
         )
     }
 
-    drawWallsAround()
-    {
-        // Check every tile around and draw wall only if type = floor
+    getTilesAround(){
+        return {
+            topLeft: this.state.tiles[this.x-1] !== undefined && this.state.tiles[this.x-1][this.y-1] !== undefined ? this.state.tiles[this.x-1][this.y-1] : false,     // top-left
+            top: this.state.tiles[this.x] !== undefined && this.state.tiles[this.x][this.y-1] !== undefined ? this.state.tiles[this.x][this.y-1] : false,             // top
+            topRight: this.state.tiles[this.x+1] !== undefined && this.state.tiles[this.x+1][this.y-1] !== undefined ? this.state.tiles[this.x+1][this.y-1] : false,    // top-right
+            right: this.state.tiles[this.x+1] !== undefined && this.state.tiles[this.x+1][this.y] !== undefined ? this.state.tiles[this.x+1][this.y] : false,           // right
+            bottomRight: this.state.tiles[this.x+1] !== undefined && this.state.tiles[this.x+1][this.y+1] !== undefined ? this.state.tiles[this.x+1][this.y+1] : false, // bottom-right
+            bottom: this.state.tiles[this.x] !== undefined && this.state.tiles[this.x] [this.y+1] !== undefined ? this.state.tiles[this.x][this.y+1] : false,          // bottom
+            bottomLeft: this.state.tiles[this.x-1] !== undefined && this.state.tiles[this.x-1][this.y+1] !== undefined ? this.state.tiles[this.x-1][this.y+1] : false,  // bottom-left
+            left: this.state.tiles[this.x-1] !== undefined && this.state.tiles[this.x-1][this.y] !== undefined ? this.state.tiles[this.x-1][this.y] : false,            // left
+        }
+    }
 
+    setWalls(){
+        var tilesAround = this.getTilesAround();
+        for(const key of Object.keys(tilesAround)){
+            var params = tilesAround[key];
+            // is wall if is floor and not undefined
+            if(params && params.type == 'floor'){
+                this.state.tiles[params.x][params.y].type = 'wall';
+                this.state.tiles[params.x][params.y].health = this.state.CONSTANTS.WALL_HEALTH;
+                this.state.walls.push(this.state.tiles[params.x][params.y]);
+            }   
+        }
     }
 
     getSprite() {

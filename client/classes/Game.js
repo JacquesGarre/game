@@ -134,11 +134,9 @@ class Game {
 
     drawWalls()
     {
-        if(this.state.currentStep !== 'zoneDrawing'){
-            for(const params of this.state.zones){
-                var zone = new Zone(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner);
-                zone.drawWallsAround();             
-            }
+        for(const params of this.state.walls){
+            var wall = new Wall(this.sprites, this.state, this.ctx, params.x, params.y, params.size);
+            wall.draw();       
         }
     }
 
@@ -164,9 +162,19 @@ class Game {
     }
 
     doorsDrawing()
-    {
-        console.log('DOORS PLACING!')
+    {   
+        if(!this.state.walls.length){
+            this.initWalls();
+        }
         this.drawTerritory();
+    }
+
+    initWalls()
+    {
+        for(const params of this.state.zones){
+            const zone = new Zone(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner);
+            zone.setWalls();
+        }
     }
 
     zoneDrawing()
@@ -210,6 +218,8 @@ class Game {
                     });
                     this.state.zones.splice(index, 1);
 
+                    this.state.tiles[tileX][tileY].type = 'floor';
+
                     // increments player resources
                     this.player.resources.zones++;
 
@@ -223,6 +233,8 @@ class Game {
                         size: this.state.CONSTANTS.TILE_SIZE,
                         owner: this.player.number       
                     });
+
+                    this.state.tiles[tileX][tileY].type = 'zone';
 
                     // decrements player resources
                     this.player.resources.zones--;

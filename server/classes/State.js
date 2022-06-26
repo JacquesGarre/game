@@ -25,6 +25,7 @@ class State {
         this.currentStep = 'zoneDrawing';
         this.players = {};
         this.zones = [];
+        this.walls = [];
     }   
     
     initTiles()
@@ -36,12 +37,14 @@ class State {
                 tiles[x][y] = {
                     x: x,
                     y: y,
-                    size: this.map.tilePixelsSize             
+                    size: this.map.tilePixelsSize ,
+                    type: 'floor'           
                 };
             }
         }
         return tiles;
     }
+
 
 }
 

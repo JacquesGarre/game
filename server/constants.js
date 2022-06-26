@@ -10,7 +10,10 @@ const CONSTANTS = {
     TILE_SIZE: 32, // Number of pixels 
     TILE_BORDER_COLOR: 'red',
     PLAYERS_COUNT: 2,
-    FPS: 5
+    RESOURCES_PER_PLAYER: {
+        zones: 4,
+        doors: 2
+    }
 }
 
 module.exports = {

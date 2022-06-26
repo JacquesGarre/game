@@ -48,11 +48,12 @@ server.on("connection", (client) => {
         client.emit('initPlayer', {
             number: playerID,
             pseudo: pseudo
-        });
+        }, CONSTANTS);
 
         state[roomID].players[playerID] = {
             number: playerID,
-            pseudo: pseudo
+            pseudo: pseudo,
+            resources: {}
         };
         
         // Sends room players count to client
@@ -73,7 +74,7 @@ server.on("connection", (client) => {
         client.emit('initPlayer', {
             number: playerID,
             pseudo: pseudo
-        });
+        }, CONSTANTS);
 
         // Sends room players count to client
         const clients = server.sockets.adapter.rooms.get(roomID);
@@ -82,7 +83,8 @@ server.on("connection", (client) => {
 
         state[roomID].players[playerID] = {
             number: playerID,
-            pseudo: pseudo
+            pseudo: pseudo,
+            resources: {}
         };
 
         // Load game with initialized state
@@ -94,21 +96,42 @@ server.on("connection", (client) => {
     client.on("gameLoaded", (roomID, playerNumber) => {
         state[roomID].playersLoaded.push(playerNumber);
         if(state[roomID].playersLoaded.length == CONSTANTS.PLAYERS_COUNT){
-            startGameLoop(client, state, roomID);
+            server.to(roomID).emit("updateState", state[roomID]);
         }
+    })
+
+    // On state updated
+    client.on("stateUpdated", (roomID, newState) => {
+        newState = checkForNextGameStep(newState);
+        state[roomID] = newState;
+        server.to(roomID).emit("updateState", state[roomID]);
     })
     
 });
 
-// Game loop interval
-function startGameLoop(client, state, roomID)
+function checkForNextGameStep(newState)
 {
-    const interval = setInterval(function(){
 
-        // Updates the state to the room every frame
-        server.to(roomID).emit("updateState", state[roomID]);
+    // test zoneDrawing
+    for(const playerID of Object.keys(newState.players)){
+        const player = newState.players[playerID];
+        if(player.resources.zones == undefined || player.resources.zones > 0){
+            newState.currentStep = 'zoneDrawing';
+            return newState;
+        }
+    }
 
-    }, 1000 / CONSTANTS.FPS);
+    // test doorsDrawing
+    for(const playerID of Object.keys(newState.players)){
+        const player = newState.players[playerID];
+        if(player.resources.doors == undefined || player.resources.doors > 0){
+            newState.currentStep = 'doorsDrawing';
+            return newState;
+        }
+    }
+
+    return newState;
+
 }
 
 // Listen on port 3000

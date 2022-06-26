@@ -1,3 +1,4 @@
+
 class Game {
 
     constructor(room, io, player, state)
@@ -15,6 +16,9 @@ class Game {
         this.steps = {
             'zoneDrawing': function(){ 
                 that.zoneDrawing(); // players will draw their zone
+            },
+            'doorsDrawing': function(){ 
+                that.doorsDrawing(); // players will draw their doors
             }
         }
     }
@@ -37,40 +41,42 @@ class Game {
                 this.sprites[position] = image;
             }
         }
+
+        // Set current player territory
+        this.player.setTerritory(this.state);
+
     }
 
     loop(state)
     {       
-        console.log(this.player)
+        var that = this;  
 
         // Updates state
         this.updateState(state);
 
         // Binds click on canvas
-        var canvas = this.canvas;        
-        canvas.onmousedown = function(e){
-            const rect = canvas.getBoundingClientRect()
+        this.canvas.onmousedown = function(e){
+            const rect = that.canvas.getBoundingClientRect()
             const x = e.clientX - rect.left
             const y = e.clientY - rect.top
-            this.player.mouseClicked = {
+            that.player.mouseClicked = {
                 x: x,
                 y: y
             }
         }
         canvas.onmouseup = function(e){
-            this.player.mouseClicked = false
+            that.player.mouseClicked = false
         }
 
         // Binds keypress
         window.addEventListener("keydown", function(){
-            this.player.keydown = true
+            that.player.keydown = true
         }, false);
         window.addEventListener("keyup", function(){
-            this.player.keydown = false
+            that.player.keydown = false
         }, false);
 
         // Game loop animation
-        var that = this;
         function animate(){
             // Animate
             window.requestAnimationFrame(animate)
@@ -82,6 +88,10 @@ class Game {
             that.drawBackground();            
             // Draws tiles
             that.drawFloor();
+            // Draws zones
+            that.drawZones();
+            // Draws walls
+            that.drawWalls();
             // Play current step
             that.steps[that.state.currentStep]()
             // Reset global alpha
@@ -122,33 +132,130 @@ class Game {
         }
     }
 
+    drawWalls()
+    {
+        if(this.state.currentStep !== 'zoneDrawing'){
+            for(const params of this.state.zones){
+                var zone = new Zone(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner);
+                zone.drawWallsAround();             
+            }
+        }
+    }
+
+    drawZones()
+    {
+        for(const params of this.state.zones){
+            var zone = new Zone(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner);
+            zone.draw();
+        }
+    }
+
     updateState(state)
     {
         this.state = state;
+        this.state.players[this.player.number] = {
+            number: this.player.number, 
+            pseudo: this.player.pseudo,
+            resources: {
+                zones: this.player.resources.zones,
+                doors: this.player.resources.doors
+            }
+        }
+    }
+
+    doorsDrawing()
+    {
+        console.log('DOORS PLACING!')
+        this.drawTerritory();
     }
 
     zoneDrawing()
     {
-        // drawing zone
-        console.log(this.player.pseudo + ' has to draw his zone');
-
-        // Draw current player territory
-        this.player.setTerritory(this.state);
         this.drawTerritory();
 
+        // Draw hover effect only if mouseposition is in territory
+        if(this.player.isHoveringHisTerritory()){
+
+            const [tileX, tileY] = this.getHoveredTile();
+
+            if(this.player.resources.zones > 0){
+                // Draw zone as hover
+                this.ctx.drawImage(
+                    this.sprites['zone'], 
+                    tileX * this.state.CONSTANTS.TILE_SIZE + this.state.canvas.xOffset,
+                    tileY * this.state.CONSTANTS.TILE_SIZE + this.state.canvas.yOffset
+                )
+            }
+
+            // If player clicks
+            if(this.player.mouseClicked !== false){
+
+                // Only 1 click;
+                this.player.mouseClicked = false;
+
+                var existingZone = false;
+                for(var zone of this.state.zones){
+                    if(zone.x == tileX && zone.y == tileY && zone.owner == this.player.number){
+                        existingZone = zone;
+                        break;
+                    }
+                }
+
+                // if it's a zone already
+                if(existingZone){
+
+                    // TODOOOOO
+
+
+                    // remove zone from state
+                    // this.state.zones = this.state.zones.filter((zone) => zone.x !== existingZone.x && zone.y !== existingZone.y && zone.owner !== existingZone.owner);
+
+                    // // increments player resources
+                    // this.player.resources.zones++;
+
+                // else push zone
+                } else if(this.player.resources.zones > 0) {
+
+                    // push zone to state
+                    this.state.zones.push({
+                        x: tileX,
+                        y: tileY,
+                        size: this.state.CONSTANTS.TILE_SIZE,
+                        owner: this.player.number       
+                    });
+
+                    // decrements player resources
+                    this.player.resources.zones -= 1;
+                }
+
+                // Tells server to update state for everybody
+                this.updateState(this.state);
+                this.io.emit("stateUpdated", this.room.id, this.state);
+
+            }
+        }
+    }
+
+    getHoveredTile()
+    {
+        var hoverPixelX = this.player.mousePosition.x - this.state.canvas.xOffset;
+        var hoverPixelY = this.player.mousePosition.y - this.state.canvas.yOffset;
+        var hoverTileX = ~~(hoverPixelX/this.state.CONSTANTS.TILE_SIZE);
+        var hoverTileY = ~~(hoverPixelY/this.state.CONSTANTS.TILE_SIZE);
+        return [hoverTileX, hoverTileY]; 
     }
 
     drawTerritory()
     {
-        this.ctx.globalAlpha = 0.5;
+        this.ctx.globalAlpha = 1;
         this.ctx.beginPath();
-        this.ctx.lineWidth = "4";
+        this.ctx.lineWidth = "1";
         this.ctx.strokeStyle = 'red';
         this.ctx.rect(
-            this.player.territory.x * this.state.CONSTANTS.TILE_SIZE + 1 + this.state.canvas.xOffset, // x
-            this.player.territory.y + 1 + this.state.canvas.yOffset, // y
-            this.player.territory.width * this.state.CONSTANTS.TILE_SIZE - 2, // width
-            this.player.territory.height * this.state.CONSTANTS.TILE_SIZE - 2 // height
+            this.player.territory.x, // x
+            this.player.territory.y, // y
+            this.player.territory.width, // width
+            this.player.territory.height // height
         ); 
         this.ctx.stroke();
     }
@@ -160,6 +267,7 @@ class Game {
         var y = 0;
 
         // Get mouse position
+        var that = this;
         this.canvas.onmousemove = function(e) {
 
             // Correct mouse position
@@ -168,8 +276,8 @@ class Game {
             y = e.clientY - rect.top;
 
             // Update state
-            this.player.mousePosition.x = x;
-            this.player.mousePosition.y = y;
+            that.player.mousePosition.x = x;
+            that.player.mousePosition.y = y;
         
         };
     }

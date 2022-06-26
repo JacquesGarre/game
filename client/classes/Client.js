@@ -28,8 +28,8 @@ class Client {
         });
 
         // When client has to init player
-        this.io.on("initPlayer", (playerParams) => {
-            this.player = new Player(this, playerParams);
+        this.io.on("initPlayer", (playerParams, CONSTANTS) => {
+            this.player = new Player(this, playerParams, CONSTANTS);
             this.room.addPlayer(this.player)
             this.room.enter();
         });

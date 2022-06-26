@@ -10,8 +10,8 @@ class State {
             height: CONSTANTS.CANVAS_HEIGHT, // pixels
             backgroundColor: CONSTANTS.CANVAS_DEFAULT_BG_COLOR,
             borderColor: CONSTANTS.CANVAS_DEFAULT_BORDER_COLOR,
-            xOffset: 100,
-            yOffset: 100
+            xOffset: 300,
+            yOffset: 300
         }
         this.map = {
             tilesX: CONSTANTS.MAP_TILES_X,
@@ -24,6 +24,7 @@ class State {
         this.playersLoaded = [];
         this.currentStep = 'zoneDrawing';
         this.players = {};
+        this.zones = [];
     }   
     
     initTiles()

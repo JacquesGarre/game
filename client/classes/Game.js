@@ -27,8 +27,11 @@ class Game {
                 that.doorsDrawing(); // players will draw their doors
             },
             'soldiersMoves': function(){ 
-                that.soldiersMoves(); // players will draw their doors
+                that.soldiersMoves(); // players will draw their soldiers paths
             },
+            'soldiersAnimation': function(){
+                that.soldiersAnimation(); // soldiers will be animated
+            }
         }
     }
 
@@ -129,8 +132,8 @@ class Game {
 
     drawBackground()
     {
-        this.ctx.fillStyle = this.state.canvas.backgroundColor;
-        this.ctx.strokeStyle = this.state.canvas.borderColor;    
+        this.ctx.fillStyle = this.state.CONSTANTS.CANVAS_DEFAULT_BG_COLOR;
+        this.ctx.strokeStyle = this.state.CONSTANTS.CANVAS_DEFAULT_BORDER_COLOR;    
         this.ctx.fillRect(
             this.state.canvas.xOffset, 
             this.state.canvas.yOffset,
@@ -185,8 +188,11 @@ class Game {
     drawSoldiers()
     {
         for(const params of this.state.soldiers){
-            var soldier = new Soldier(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner, params.health, params.energy);
+            var soldier = new Soldier(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner, params.health, params.energy, this.player.number);
             soldier.draw();
+            if(soldier.owner == this.player.number){
+                soldier.drawPath();
+            }
         }
     }
 
@@ -202,101 +208,129 @@ class Game {
         }
     }
 
+    soldiersAnimation()
+    {
+        console.log('ANIMATE!');
+    }
+
     soldiersMoves()
     {   
+        if(this.state.players[this.player.number].finishedMoves){
+            return;
+        }
 
         // If players presse a key, he finished his turn
         if(this.player.keydown){
+            this.player.keydown = false;
             this.player.finishedMoves = true;
             this.updateState(this.state);
             this.io.emit("stateUpdated", this.room.id, this.state);
+            return;
         }
 
         var [tileX, tileY] = this.getHoveredTile();
 
         if(this.state.tiles[tileX] !== undefined && this.state.tiles[tileX][tileY] !== undefined){
             const hoveredTile = this.state.tiles[tileX][tileY];
+
             if(this.player.isHoveringOneOfHisSoldiers(hoveredTile, this.state)){
 
                 var params = this.player.getSoldier(hoveredTile, this.state);
 
                 // Display hover effect over soldier
-                var soldier = new Soldier(this.sprites, this.state, this.ctx, tileX, tileY, this.state.CONSTANTS.TILE_SIZE, this.player.number, params.health, params.energy);
+                var soldier = new Soldier(this.sprites, this.state, this.ctx, tileX, tileY, this.state.CONSTANTS.TILE_SIZE, this.player.number, params.health, params.energy, this.player.number);
                 soldier.drawHoverEffect();
 
                 // If player clicks on hovered soldier, draw the character as selected
                 if(this.player.mouseClicked !== false){
+
                     // reset click
                     this.player.mouseClicked = false;
+
+                    // Select or unselect player
                     const index = this.state.soldiers.findIndex(char => {
                         return char.x == soldier.x && char.y == soldier.y && char.owner == soldier.owner;
                     });
-
                     this.state.soldiers[index].selected = this.state.soldiers[index].selected !== undefined ? !this.state.soldiers[index].selected : true;
+
                     // unselect all other characters
                     for(const id of Object.keys(this.state.soldiers)){
-                        if(id != index && this.state.soldiers[id].owner == this.player.number){
+                        if(this.state.soldiers[id].owner == this.player.number && id != index){
                             this.state.soldiers[id].selected = false;
                         }
                     }
 
+                    this.updateState(this.state);
+                    this.io.emit("stateUpdated", this.room.id, this.state);
+
                 }
 
+            // Unselecting last path
+            } else if(this.player.mouseClicked !== false){
+                this.player.mouseClicked = false;
+                const playerSoldiers = this.state.soldiers.filter(soldier => {
+                    return soldier.owner == this.player.number;
+                });
+                for(soldier of playerSoldiers){
+                    if(soldier.path.length){
+                        var lastPath = soldier.path[soldier.path.length - 1];
+                        if(lastPath.x == tileX && lastPath.y == tileY){
+                            soldier.path.pop();
+                            soldier.energy++;
+                        }
+                    }
+                }
+                this.updateState(this.state);
+                this.io.emit("stateUpdated", this.room.id, this.state);
+
             }
+
+            
+
         }
+
 
 
     }
 
     drawPossibleMoves()
     {
-        for(const params of this.state.soldiers){
-            var soldier = new Soldier(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner, params.health, params.energy);
+        let playerPaths = this.player.getPaths(this.state);
+        for(const index in this.state.soldiers){
+            var params = this.state.soldiers[index];
+            var soldier = new Soldier(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner, params.health, params.energy, this.player.number);
             if(soldier.owner == this.player.number && soldier.selected && soldier.energy > 0){
-                let tilesAround = soldier.getTilesAround()
+                
+                let tilesAround = soldier.getMovesAround()
 
                 for (var tileKey of Object.keys(tilesAround)) {
                     var tile = tilesAround[tileKey];
-        
-                    if(['top','right', 'bottom', 'left'].includes(tileKey) && tile && (tile.type == 'zone' || tile.type == 'door' || tile.type == 'floor')){
-        
-                        // Draw line around
-                        this.ctx.globalAlpha = 0.4;
-                        this.ctx.beginPath();
-                        this.ctx.lineWidth = "1";
-                        this.ctx.strokeStyle = this.state.CONSTANTS.POSSIBLE_MOVES_COLOR;
-                        this.ctx.rect(
-                            tile.x * tile.size + this.state.canvas.xOffset, // x
-                            tile.y * tile.size + this.state.canvas.yOffset, // y
-                            tile.size, // width
-                            tile.size // height
-                        ); 
-                        this.ctx.stroke();
-                        
-                        // Fill rectangle
-                        this.ctx.fillStyle = this.state.CONSTANTS.POSSIBLE_MOVES_COLOR;
-                        this.ctx.fillRect(
-                            tile.x * tile.size + this.state.canvas.xOffset, // x
-                            tile.y * tile.size + this.state.canvas.yOffset, // y
-                            tile.size, // width
-                            tile.size // height
-                        )
-        
-                        this.ctx.globalAlpha = 1;
-                        // // if clicked
-                        // if(tile.isClicked() && characterSelected.energy > 0){
-                        //     characterSelected.energy--;
-                        //     characterSelected.path.push(tile);
-                        //     state.mouseClicked = false;
-                        //     tile.walkable = false;
-                        //     tile.selected = true;
-                        // }
-        
+                    if(soldier.x == tile.x && soldier.y == tile.y){
+                        continue;
+                    }
+                    let tileObj = new Tile(tile.x, tile.y, this.state, this.ctx, tile.size, this.player)
+                    if(
+                        ['top','right', 'bottom', 'left'].includes(tileKey) 
+                        && tile 
+                        && (tile.type == 'zone' || tile.type == 'door' || tile.type == 'floor')
+                        && !this.state.soldiers[index].path.includes(tile)
+                        && !playerPaths.includes(tile)
+                    ){
+                        tileObj.drawAsPossibleMove();                        
+                        if(tileObj.isClicked()){
+                            this.player.mouseClicked = false;
+                            this.state.soldiers[index].energy--;
+                            this.state.soldiers[index].path.push(tile);
+                            this.updateState(this.state);
+                            this.io.emit("stateUpdated", this.room.id, this.state);
+                        }
+
                     }
                 }
             }
 
         }
+
 
     }
 
@@ -406,7 +440,7 @@ class Game {
 
             if(this.player.isHoveringOneOfHisZones(hoveredTile) && !existingKing){
 
-                var soldier = new Soldier(this.sprites, this.state, this.ctx, tileX, tileY, this.state.CONSTANTS.TILE_SIZE, this.player.number, this.state.CONSTANTS.SOLDIER_HEALTH, this.state.CONSTANTS.SOLDIER_ENERGY);
+                var soldier = new Soldier(this.sprites, this.state, this.ctx, tileX, tileY, this.state.CONSTANTS.TILE_SIZE, this.player.number, this.state.CONSTANTS.SOLDIER_HEALTH, this.state.CONSTANTS.SOLDIER_ENERGY, this.player.number);
                 if(this.player.resources.soldiers > 0){
                     // Draw door on hover
                     soldier.draw();
@@ -449,7 +483,8 @@ class Game {
                             owner: this.player.number,
                             health: this.state.CONSTANTS.SOLDIER_HEALTH,
                             energy: this.state.CONSTANTS.SOLDIER_ENERGY,
-                            selected: false
+                            selected: false,
+                            path: []
                         });
 
                         // decrements player resources

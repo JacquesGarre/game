@@ -72,4 +72,17 @@ class Player {
         return false;
     }
 
+    getPaths(state)
+    {
+        let paths = [];
+        for(var soldier of state.soldiers){
+            if(soldier.owner == this.number && soldier.path.length > 0){
+                for(const tile of soldier.path){
+                    paths.push(tile);
+                }
+            }
+        }
+        return paths;
+    }
+
 }

@@ -1,6 +1,6 @@
 class Soldier {
 
-    constructor(sprites, state, ctx, x, y, size, playerNumber, health, energy)
+    constructor(sprites, state, ctx, x, y, size, playerNumber, health, energy, currentPlayerNumber)
     {
         this.x = x;
         this.y = y;
@@ -12,10 +12,12 @@ class Soldier {
         this.sprite = this.sprites['soldier_idle_down_0'];
         this.health = health;
         this.energy = energy;
+        this.currentPlayerNumber = currentPlayerNumber;
         const index = this.state.soldiers.findIndex(char => {
             return char.x == this.x && char.y == this.y && char.owner == this.owner;
         });
-        this.selected = this.state.soldiers[index].selected !== undefined ? this.state.soldiers[index].selected : false;
+        this.selected = index >= 0 && this.state.soldiers[index].selected !== undefined ? this.state.soldiers[index].selected : false;
+        this.path = index >= 0 ? this.state.soldiers[index].path : [];
     }
 
     draw()
@@ -33,7 +35,7 @@ class Soldier {
         )
 
         // If selected, draw hover effect constantly
-        if(this.selected){
+        if(this.selected && this.owner == this.currentPlayerNumber){
             this.drawSquareAround();
             this.drawBars();
         }
@@ -135,16 +137,63 @@ class Soldier {
         )
     }
 
-    getTilesAround(){
+    getTilesAround(x, y){
         return {
-            topLeft: this.state.tiles[this.x-1] !== undefined && this.state.tiles[this.x-1][this.y-1] !== undefined ? this.state.tiles[this.x-1][this.y-1] : false,     // top-left
-            top: this.state.tiles[this.x] !== undefined && this.state.tiles[this.x][this.y-1] !== undefined ? this.state.tiles[this.x][this.y-1] : false,             // top
-            topRight: this.state.tiles[this.x+1] !== undefined && this.state.tiles[this.x+1][this.y-1] !== undefined ? this.state.tiles[this.x+1][this.y-1] : false,    // top-right
-            right: this.state.tiles[this.x+1] !== undefined && this.state.tiles[this.x+1][this.y] !== undefined ? this.state.tiles[this.x+1][this.y] : false,           // right
-            bottomRight: this.state.tiles[this.x+1] !== undefined && this.state.tiles[this.x+1][this.y+1] !== undefined ? this.state.tiles[this.x+1][this.y+1] : false, // bottom-right
-            bottom: this.state.tiles[this.x] !== undefined && this.state.tiles[this.x] [this.y+1] !== undefined ? this.state.tiles[this.x][this.y+1] : false,          // bottom
-            bottomLeft: this.state.tiles[this.x-1] !== undefined && this.state.tiles[this.x-1][this.y+1] !== undefined ? this.state.tiles[this.x-1][this.y+1] : false,  // bottom-left
-            left: this.state.tiles[this.x-1] !== undefined && this.state.tiles[this.x-1][this.y] !== undefined ? this.state.tiles[this.x-1][this.y] : false,            // left
+            topLeft: this.state.tiles[x-1] !== undefined && this.state.tiles[x-1][y-1] !== undefined ? this.state.tiles[x-1][y-1] : false,     // top-left
+            top: this.state.tiles[x] !== undefined && this.state.tiles[x][y-1] !== undefined ? this.state.tiles[x][y-1] : false,             // top
+            topRight: this.state.tiles[x+1] !== undefined && this.state.tiles[x+1][y-1] !== undefined ? this.state.tiles[x+1][y-1] : false,    // top-right
+            right: this.state.tiles[x+1] !== undefined && this.state.tiles[x+1][y] !== undefined ? this.state.tiles[x+1][y] : false,           // right
+            bottomRight: this.state.tiles[x+1] !== undefined && this.state.tiles[x+1][y+1] !== undefined ? this.state.tiles[x+1][y+1] : false, // bottom-right
+            bottom: this.state.tiles[x] !== undefined && this.state.tiles[x] [y+1] !== undefined ? this.state.tiles[x][y+1] : false,          // bottom
+            bottomLeft: this.state.tiles[x-1] !== undefined && this.state.tiles[x-1][y+1] !== undefined ? this.state.tiles[x-1][y+1] : false,  // bottom-left
+            left: this.state.tiles[x-1] !== undefined && this.state.tiles[x-1][y] !== undefined ? this.state.tiles[x-1][y] : false,            // left
+        }
+    }
+
+    getMovesAround(){
+
+        // Tiles around player itself
+        if(this.path.length == 0){
+            
+            return this.getTilesAround(this.x, this.y);
+
+        // Tiles around last tile selected
+        } else {
+
+            let lastPath = this.path[this.path.length - 1];
+            return this.getTilesAround(lastPath.x, lastPath.y);
+        }
+
+    }
+
+    drawPath()
+    {
+        for(const tile of this.path){
+
+            // Draw line around
+            this.ctx.globalAlpha = 0.4;
+            this.ctx.beginPath();
+            this.ctx.lineWidth = "1";
+            this.ctx.strokeStyle = this.state.CONSTANTS.PATH_COLOR;
+            this.ctx.rect(
+                tile.x * tile.size + this.state.canvas.xOffset, // x
+                tile.y * tile.size + this.state.canvas.yOffset, // y
+                tile.size, // width
+                tile.size // height
+            ); 
+            this.ctx.stroke();
+            
+            // Fill rectangle
+            this.ctx.fillStyle = this.state.CONSTANTS.PATH_COLOR;
+            this.ctx.fillRect(
+                tile.x * tile.size + this.state.canvas.xOffset, // x
+                tile.y * tile.size + this.state.canvas.yOffset, // y
+                tile.size, // width
+                tile.size // height
+            )
+
+            this.ctx.globalAlpha = 1;
+
         }
     }
 

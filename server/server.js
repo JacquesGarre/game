@@ -13,6 +13,8 @@ const server = new Server({
 const clientRooms = {};
 const state = {};
 
+const debugging = true;
+
 // On connection
 server.on("connection", (client) => {
 
@@ -50,17 +52,18 @@ server.on("connection", (client) => {
             pseudo: pseudo
         }, CONSTANTS);
 
-        /* DEBUG! A REMETTRE 
-        state[roomID].players[playerID] = {
-            number: playerID,
-            pseudo: pseudo,
-            resources: {}
-        };
-        */
+        if(!debugging){
+            state[roomID].players[playerID] = {
+                number: playerID,
+                pseudo: pseudo,
+                resources: {}
+            };
+        }
 
-        /* DEBUG! A RETIRER */
-        state[roomID] = debug();
-        
+        if(debugging){
+            state[roomID] = debug();
+        }
+
         // Sends room players count to client
         const clients = server.sockets.adapter.rooms.get(roomID);
         const numClients = clients ? clients.size : 0;
@@ -86,13 +89,13 @@ server.on("connection", (client) => {
         const numClients = clients ? clients.size : 0;
         server.to(roomID).emit("roomPlayersCount", numClients);
 
-        /* DEBUG! A REMETTRE
-        state[roomID].players[playerID] = {
-            number: playerID,
-            pseudo: pseudo,
-            resources: {}
-        };
-        */
+        if(!debugging){
+            state[roomID].players[playerID] = {
+                number: playerID,
+                pseudo: pseudo,
+                resources: {}
+            };
+        }
 
         // Load game with initialized state
         server.to(roomID).emit("loadGame", state[roomID]);
@@ -111,6 +114,14 @@ server.on("connection", (client) => {
     client.on("stateUpdated", (roomID, newState) => {
         newState = checkForNextGameStep(newState);
         state[roomID] = newState;
+
+        for(const playerID of Object.keys(newState.players)){
+            const player = newState.players[playerID];
+            if(player.finishedMoves == true){
+                console.log('a player has finished his moves', player)
+            }
+        }
+
         server.to(roomID).emit("updateState", state[roomID]);
     })
     
@@ -158,13 +169,17 @@ function checkForNextGameStep(newState)
     // test soldiersMoves
     for(const playerID of Object.keys(newState.players)){
         const player = newState.players[playerID];
-        if(!player.finishedMoves){
+        if(player.finishedMoves !== true){
             newState.currentStep = 'soldiersMoves';
             return newState;
         }
     }
 
-    
+    newState.currentStep = 'soldiersAnimation';
+
+    console.log("\n\n\n\n\n\n\n\n\n\n")
+    console.log('NEW STATE!, CHARACTER ANIMATION!!!')
+
     //console.log(JSON.stringify(newState));
     
 
@@ -198,10 +213,7 @@ function debug(){
                     "x": 0,
                     "y": 0,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_topLeft"
+                    "type": "floor"
                 },
                 {
                     "x": 0,
@@ -210,7 +222,7 @@ function debug(){
                     "type": "wall",
                     "health": 3,
                     "owner": 0,
-                    "sprite": "wall_left"
+                    "sprite": "wall_topLeft"
                 },
                 {
                     "x": 0,
@@ -219,13 +231,16 @@ function debug(){
                     "type": "wall",
                     "health": 3,
                     "owner": 0,
-                    "sprite": "wall_bottomLeft"
+                    "sprite": "wall_left"
                 },
                 {
                     "x": 0,
                     "y": 3,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_bottomLeft"
                 },
                 {
                     "x": 0,
@@ -257,6 +272,12 @@ function debug(){
                     "x": 1,
                     "y": 0,
                     "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 1,
+                    "y": 1,
+                    "size": 32,
                     "type": "wall",
                     "health": 3,
                     "owner": 0,
@@ -264,14 +285,14 @@ function debug(){
                 },
                 {
                     "x": 1,
-                    "y": 1,
+                    "y": 2,
                     "size": 32,
                     "type": "zone",
                     "owner": 0
                 },
                 {
                     "x": 1,
-                    "y": 2,
+                    "y": 3,
                     "size": 32,
                     "type": "wall",
                     "health": 3,
@@ -280,12 +301,6 @@ function debug(){
                 },
                 {
                     "x": 1,
-                    "y": 3,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 1,
                     "y": 4,
                     "size": 32,
                     "type": "floor"
@@ -313,6 +328,12 @@ function debug(){
                 {
                     "x": 2,
                     "y": 0,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 2,
+                    "y": 1,
                     "size": 32,
                     "type": "wall",
                     "health": 3,
@@ -321,7 +342,7 @@ function debug(){
                 },
                 {
                     "x": 2,
-                    "y": 1,
+                    "y": 2,
                     "size": 32,
                     "type": "wall",
                     "health": 3,
@@ -330,7 +351,7 @@ function debug(){
                 },
                 {
                     "x": 2,
-                    "y": 2,
+                    "y": 3,
                     "size": 32,
                     "type": "wall",
                     "health": 3,
@@ -339,27 +360,15 @@ function debug(){
                 },
                 {
                     "x": 2,
-                    "y": 3,
+                    "y": 4,
                     "size": 32,
                     "type": "floor"
                 },
                 {
                     "x": 2,
-                    "y": 4,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_topLeft"
-                },
-                {
-                    "x": 2,
                     "y": 5,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_left"
+                    "type": "floor"
                 },
                 {
                     "x": 2,
@@ -368,13 +377,16 @@ function debug(){
                     "type": "wall",
                     "health": 3,
                     "owner": 0,
-                    "sprite": "wall_bottomLeft"
+                    "sprite": "wall_topLeft"
                 },
                 {
                     "x": 2,
                     "y": 7,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_left"
                 }
             ],
             [
@@ -406,32 +418,29 @@ function debug(){
                     "x": 3,
                     "y": 4,
                     "size": 32,
-                    "type": "wall",
+                    "type": "floor"
+                },
+                {
+                    "x": 3,
+                    "y": 5,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 3,
+                    "y": 6,
+                    "size": 32,
+                    "type": "door",
                     "health": 3,
                     "owner": 0,
                     "sprite": "wall_bottom"
                 },
                 {
                     "x": 3,
-                    "y": 5,
+                    "y": 7,
                     "size": 32,
                     "type": "zone",
                     "owner": 0
-                },
-                {
-                    "x": 3,
-                    "y": 6,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_top"
-                },
-                {
-                    "x": 3,
-                    "y": 7,
-                    "size": 32,
-                    "type": "floor"
                 }
             ],
             [
@@ -462,6 +471,18 @@ function debug(){
                 {
                     "x": 4,
                     "y": 4,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 4,
+                    "y": 5,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 4,
+                    "y": 6,
                     "size": 32,
                     "type": "wall",
                     "health": 3,
@@ -470,27 +491,12 @@ function debug(){
                 },
                 {
                     "x": 4,
-                    "y": 5,
-                    "size": 32,
-                    "type": "door",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_right"
-                },
-                {
-                    "x": 4,
-                    "y": 6,
+                    "y": 7,
                     "size": 32,
                     "type": "wall",
                     "health": 3,
                     "owner": 0,
-                    "sprite": "wall_bottomRight"
-                },
-                {
-                    "x": 4,
-                    "y": 7,
-                    "size": 32,
-                    "type": "floor"
+                    "sprite": "wall_right"
                 }
             ],
             [
@@ -634,18 +640,78 @@ function debug(){
                     "x": 7,
                     "y": 6,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_topLeft"
                 },
                 {
                     "x": 7,
                     "y": 7,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_left"
                 }
             ],
             [
                 {
                     "x": 8,
+                    "y": 0,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 8,
+                    "y": 1,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 8,
+                    "y": 2,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 8,
+                    "y": 3,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 8,
+                    "y": 4,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 8,
+                    "y": 5,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 8,
+                    "y": 6,
+                    "size": 32,
+                    "type": "door",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_bottom"
+                },
+                {
+                    "x": 8,
+                    "y": 7,
+                    "size": 32,
+                    "type": "zone",
+                    "owner": 1
+                }
+            ],
+            [
+                {
+                    "x": 9,
                     "y": 0,
                     "size": 32,
                     "type": "wall",
@@ -654,7 +720,7 @@ function debug(){
                     "sprite": "wall_topLeft"
                 },
                 {
-                    "x": 8,
+                    "x": 9,
                     "y": 1,
                     "size": 32,
                     "type": "wall",
@@ -663,7 +729,7 @@ function debug(){
                     "sprite": "wall_left"
                 },
                 {
-                    "x": 8,
+                    "x": 9,
                     "y": 2,
                     "size": 32,
                     "type": "wall",
@@ -672,48 +738,45 @@ function debug(){
                     "sprite": "wall_bottomLeft"
                 },
                 {
-                    "x": 8,
+                    "x": 9,
                     "y": 3,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_topLeft"
+                    "type": "floor"
                 },
                 {
-                    "x": 8,
+                    "x": 9,
                     "y": 4,
                     "size": 32,
-                    "type": "door",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_left"
+                    "type": "floor"
                 },
                 {
-                    "x": 8,
+                    "x": 9,
                     "y": 5,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 9,
+                    "y": 6,
                     "size": 32,
                     "type": "wall",
                     "health": 3,
                     "owner": 1,
-                    "sprite": "wall_bottomLeft"
+                    "sprite": "wall_topRight"
                 },
                 {
-                    "x": 8,
-                    "y": 6,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 8,
+                    "x": 9,
                     "y": 7,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_right"
                 }
             ],
             [
                 {
-                    "x": 9,
+                    "x": 10,
                     "y": 0,
                     "size": 32,
                     "type": "wall",
@@ -722,14 +785,14 @@ function debug(){
                     "sprite": "wall_bottom"
                 },
                 {
-                    "x": 9,
+                    "x": 10,
                     "y": 1,
                     "size": 32,
                     "type": "zone",
                     "owner": 1
                 },
                 {
-                    "x": 9,
+                    "x": 10,
                     "y": 2,
                     "size": 32,
                     "type": "wall",
@@ -738,97 +801,22 @@ function debug(){
                     "sprite": "wall_top"
                 },
                 {
-                    "x": 9,
-                    "y": 3,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_bottom"
-                },
-                {
-                    "x": 9,
-                    "y": 4,
-                    "size": 32,
-                    "type": "zone",
-                    "owner": 1
-                },
-                {
-                    "x": 9,
-                    "y": 5,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_top"
-                },
-                {
-                    "x": 9,
-                    "y": 6,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 9,
-                    "y": 7,
-                    "size": 32,
-                    "type": "floor"
-                }
-            ],
-            [
-                {
-                    "x": 10,
-                    "y": 0,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_topRight"
-                },
-                {
-                    "x": 10,
-                    "y": 1,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_right"
-                },
-                {
-                    "x": 10,
-                    "y": 2,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_bottomRight"
-                },
-                {
                     "x": 10,
                     "y": 3,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_topRight"
+                    "type": "floor"
                 },
                 {
                     "x": 10,
                     "y": 4,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_right"
+                    "type": "floor"
                 },
                 {
                     "x": 10,
                     "y": 5,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_bottomRight"
+                    "type": "floor"
                 },
                 {
                     "x": 10,
@@ -848,19 +836,28 @@ function debug(){
                     "x": 11,
                     "y": 0,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_topRight"
                 },
                 {
                     "x": 11,
                     "y": 1,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_right"
                 },
                 {
                     "x": 11,
                     "y": 2,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_bottomRight"
                 },
                 {
                     "x": 11,
@@ -918,7 +915,8 @@ function debug(){
             "SOLDIER_HEALTH": 10,
             "SOLDIER_ENERGY": 5,
             "HOVER_BORDER_COLOR": "purple",
-            "POSSIBLE_MOVES_COLOR": "purple"
+            "POSSIBLE_MOVES_COLOR": "purple",
+            "PATH_COLOR": "red"
         },
         "SPRITES": {
             "floor_topLeft": "assets/map/floor/top-left.png",
@@ -975,60 +973,60 @@ function debug(){
             "king": "assets/map/characters/king/king.png"
         },
         "playersLoaded": [],
-        "currentStep": "soldiersMoves",
+        "currentStep": "soldiersAnimation",
         "players": {
             "0": {
                 "number": 0,
-                "pseudo": "csacascsac",
+                "pseudo": "sacascasc",
                 "resources": {
                     "zones": 0,
                     "doors": 0,
                     "kings": 0,
                     "soldiers": 0
                 },
-                "finishedMoves": false
+                "finishedMoves": true
             },
             "1": {
                 "number": 1,
-                "pseudo": "sacsaccasc",
+                "pseudo": "ascascasc",
                 "resources": {
                     "zones": 0,
                     "doors": 0,
                     "kings": 0,
                     "soldiers": 0
                 },
-                "finishedMoves": false
+                "finishedMoves": true
             }
         },
         "zones": [
             {
-                "x": 9,
+                "x": 10,
                 "y": 1,
                 "size": 32,
                 "owner": 1
             },
             {
-                "x": 9,
-                "y": 4,
+                "x": 8,
+                "y": 7,
                 "size": 32,
                 "owner": 1
             },
             {
                 "x": 1,
-                "y": 1,
+                "y": 2,
                 "size": 32,
                 "owner": 0
             },
             {
                 "x": 3,
-                "y": 5,
+                "y": 7,
                 "size": 32,
                 "owner": 0
             }
         ],
         "walls": [
             {
-                "x": 8,
+                "x": 9,
                 "y": 0,
                 "size": 32,
                 "type": "wall",
@@ -1037,7 +1035,7 @@ function debug(){
                 "sprite": "wall_topLeft"
             },
             {
-                "x": 9,
+                "x": 10,
                 "y": 0,
                 "size": 32,
                 "type": "wall",
@@ -1046,7 +1044,7 @@ function debug(){
                 "sprite": "wall_bottom"
             },
             {
-                "x": 10,
+                "x": 11,
                 "y": 0,
                 "size": 32,
                 "type": "wall",
@@ -1055,7 +1053,7 @@ function debug(){
                 "sprite": "wall_topRight"
             },
             {
-                "x": 10,
+                "x": 11,
                 "y": 1,
                 "size": 32,
                 "type": "wall",
@@ -1064,7 +1062,7 @@ function debug(){
                 "sprite": "wall_right"
             },
             {
-                "x": 10,
+                "x": 11,
                 "y": 2,
                 "size": 32,
                 "type": "wall",
@@ -1073,7 +1071,7 @@ function debug(){
                 "sprite": "wall_bottomRight"
             },
             {
-                "x": 9,
+                "x": 10,
                 "y": 2,
                 "size": 32,
                 "type": "wall",
@@ -1082,7 +1080,7 @@ function debug(){
                 "sprite": "wall_top"
             },
             {
-                "x": 8,
+                "x": 9,
                 "y": 2,
                 "size": 32,
                 "type": "wall",
@@ -1091,7 +1089,7 @@ function debug(){
                 "sprite": "wall_bottomLeft"
             },
             {
-                "x": 8,
+                "x": 9,
                 "y": 1,
                 "size": 32,
                 "type": "wall",
@@ -1100,8 +1098,8 @@ function debug(){
                 "sprite": "wall_left"
             },
             {
-                "x": 8,
-                "y": 3,
+                "x": 7,
+                "y": 6,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1110,16 +1108,7 @@ function debug(){
             },
             {
                 "x": 9,
-                "y": 3,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 1,
-                "sprite": "wall_bottom"
-            },
-            {
-                "x": 10,
-                "y": 3,
+                "y": 6,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1127,8 +1116,8 @@ function debug(){
                 "sprite": "wall_topRight"
             },
             {
-                "x": 10,
-                "y": 4,
+                "x": 9,
+                "y": 7,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1136,35 +1125,17 @@ function debug(){
                 "sprite": "wall_right"
             },
             {
-                "x": 10,
-                "y": 5,
+                "x": 7,
+                "y": 7,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
                 "owner": 1,
-                "sprite": "wall_bottomRight"
-            },
-            {
-                "x": 9,
-                "y": 5,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 1,
-                "sprite": "wall_top"
-            },
-            {
-                "x": 8,
-                "y": 5,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 1,
-                "sprite": "wall_bottomLeft"
+                "sprite": "wall_left"
             },
             {
                 "x": 0,
-                "y": 0,
+                "y": 1,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1173,7 +1144,7 @@ function debug(){
             },
             {
                 "x": 1,
-                "y": 0,
+                "y": 1,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1182,7 +1153,7 @@ function debug(){
             },
             {
                 "x": 2,
-                "y": 0,
+                "y": 1,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1191,7 +1162,7 @@ function debug(){
             },
             {
                 "x": 2,
-                "y": 1,
+                "y": 2,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1200,7 +1171,7 @@ function debug(){
             },
             {
                 "x": 2,
-                "y": 2,
+                "y": 3,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1209,7 +1180,7 @@ function debug(){
             },
             {
                 "x": 1,
-                "y": 2,
+                "y": 3,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1218,7 +1189,7 @@ function debug(){
             },
             {
                 "x": 0,
-                "y": 2,
+                "y": 3,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1227,7 +1198,7 @@ function debug(){
             },
             {
                 "x": 0,
-                "y": 1,
+                "y": 2,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1236,7 +1207,7 @@ function debug(){
             },
             {
                 "x": 2,
-                "y": 4,
+                "y": 6,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1244,17 +1215,8 @@ function debug(){
                 "sprite": "wall_topLeft"
             },
             {
-                "x": 3,
-                "y": 4,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
-                "sprite": "wall_bottom"
-            },
-            {
                 "x": 4,
-                "y": 4,
+                "y": 6,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1263,34 +1225,16 @@ function debug(){
             },
             {
                 "x": 4,
-                "y": 6,
+                "y": 7,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
                 "owner": 0,
-                "sprite": "wall_bottomRight"
-            },
-            {
-                "x": 3,
-                "y": 6,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
-                "sprite": "wall_top"
+                "sprite": "wall_right"
             },
             {
                 "x": 2,
-                "y": 6,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
-                "sprite": "wall_bottomLeft"
-            },
-            {
-                "x": 2,
-                "y": 5,
+                "y": 7,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1300,32 +1244,32 @@ function debug(){
         ],
         "doors": [
             {
-                "x": 8,
-                "y": 4,
+                "x": 3,
+                "y": 6,
                 "size": 32,
-                "owner": 1,
-                "sprite": "door_left",
+                "owner": 0,
+                "sprite": "door_bottom",
                 "health": 2
             },
             {
-                "x": 4,
-                "y": 5,
+                "x": 8,
+                "y": 6,
                 "size": 32,
-                "owner": 0,
-                "sprite": "door_right",
+                "owner": 1,
+                "sprite": "door_bottom",
                 "health": 2
             }
         ],
         "kings": [
             {
                 "x": 1,
-                "y": 1,
+                "y": 2,
                 "size": 32,
                 "owner": 0,
                 "health": 30
             },
             {
-                "x": 9,
+                "x": 10,
                 "y": 1,
                 "size": 32,
                 "owner": 1,
@@ -1334,40 +1278,92 @@ function debug(){
         ],
         "soldiers": [
             {
-                "x": 3,
-                "y": 5,
+                "x": 8,
+                "y": 7,
                 "size": 32,
-                "owner": 0,
+                "owner": 1,
                 "health": 10,
-                "energy": 5,
-                "selected": false
+                "energy": 0,
+                "selected": true,
+                "path": [
+                    {
+                        "x": 8,
+                        "y": 6,
+                        "size": 32,
+                        "type": "door",
+                        "health": 3,
+                        "owner": 1,
+                        "sprite": "wall_bottom"
+                    },
+                    {
+                        "x": 8,
+                        "y": 5,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 8,
+                        "y": 4,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 7,
+                        "y": 4,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 6,
+                        "y": 4,
+                        "size": 32,
+                        "type": "floor"
+                    }
+                ]
             },
             {
-                "x": 5,
+                "x": 3,
                 "y": 7,
                 "size": 32,
                 "owner": 0,
                 "health": 10,
-                "energy": 5,
-                "selected": false
-            },
-            {
-                "x": 9,
-                "y": 4,
-                "size": 32,
-                "owner": 1,
-                "health": 10,
-                "energy": 5,
-                "selected": false
-            },
-            {
-                "x": 4,
-                "y": 4,
-                "size": 32,
-                "owner": 1,
-                "health": 10,
-                "energy": 5,
-                "selected": false
+                "energy": 0,
+                "selected": true,
+                "path": [
+                    {
+                        "x": 3,
+                        "y": 6,
+                        "size": 32,
+                        "type": "door",
+                        "health": 3,
+                        "owner": 0,
+                        "sprite": "wall_bottom"
+                    },
+                    {
+                        "x": 3,
+                        "y": 5,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 4,
+                        "y": 5,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 4,
+                        "y": 4,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 5,
+                        "y": 4,
+                        "size": 32,
+                        "type": "floor"
+                    }
+                ]
             }
         ]
     }

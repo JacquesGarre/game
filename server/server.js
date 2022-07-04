@@ -917,7 +917,8 @@ function debug(){
             "KING_HEALTH": 30,
             "SOLDIER_HEALTH": 10,
             "SOLDIER_ENERGY": 5,
-            "HOVER_BORDER_COLOR": "purple"
+            "HOVER_BORDER_COLOR": "purple",
+            "POSSIBLE_MOVES_COLOR": "purple"
         },
         "SPRITES": {
             "floor_topLeft": "assets/map/floor/top-left.png",

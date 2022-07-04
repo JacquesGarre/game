@@ -34,7 +34,8 @@ class Soldier {
 
         // If selected, draw hover effect constantly
         if(this.selected){
-            this.drawHoverEffect();
+            this.drawSquareAround();
+            this.drawBars();
         }
         
     }
@@ -54,6 +55,12 @@ class Soldier {
 
     drawHoverEffect()
     {   
+        this.drawSquareAround();
+        this.drawBars();
+    }
+
+    drawSquareAround()
+    {
         this.ctx.beginPath();
         this.ctx.rect(
             this.x * this.size + this.state.canvas.xOffset,
@@ -63,8 +70,6 @@ class Soldier {
         )
         this.ctx.strokeStyle = this.state.CONSTANTS.HOVER_BORDER_COLOR;
         this.ctx.stroke();
-
-        this.drawBars();
     }
 
     drawBars()
@@ -128,6 +133,19 @@ class Soldier {
             energyBar, // width
             5 // height
         )
+    }
+
+    getTilesAround(){
+        return {
+            topLeft: this.state.tiles[this.x-1] !== undefined && this.state.tiles[this.x-1][this.y-1] !== undefined ? this.state.tiles[this.x-1][this.y-1] : false,     // top-left
+            top: this.state.tiles[this.x] !== undefined && this.state.tiles[this.x][this.y-1] !== undefined ? this.state.tiles[this.x][this.y-1] : false,             // top
+            topRight: this.state.tiles[this.x+1] !== undefined && this.state.tiles[this.x+1][this.y-1] !== undefined ? this.state.tiles[this.x+1][this.y-1] : false,    // top-right
+            right: this.state.tiles[this.x+1] !== undefined && this.state.tiles[this.x+1][this.y] !== undefined ? this.state.tiles[this.x+1][this.y] : false,           // right
+            bottomRight: this.state.tiles[this.x+1] !== undefined && this.state.tiles[this.x+1][this.y+1] !== undefined ? this.state.tiles[this.x+1][this.y+1] : false, // bottom-right
+            bottom: this.state.tiles[this.x] !== undefined && this.state.tiles[this.x] [this.y+1] !== undefined ? this.state.tiles[this.x][this.y+1] : false,          // bottom
+            bottomLeft: this.state.tiles[this.x-1] !== undefined && this.state.tiles[this.x-1][this.y+1] !== undefined ? this.state.tiles[this.x-1][this.y+1] : false,  // bottom-left
+            left: this.state.tiles[this.x-1] !== undefined && this.state.tiles[this.x-1][this.y] !== undefined ? this.state.tiles[this.x-1][this.y] : false,            // left
+        }
     }
 
 }

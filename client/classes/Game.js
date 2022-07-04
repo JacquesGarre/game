@@ -107,6 +107,9 @@ class Game {
             that.drawKings();
             // Draws soldiers
             that.drawSoldiers();
+            // Draw possible moves if a soldier is selected
+            that.drawPossibleMoves();
+
             // Play current step
             that.steps[that.state.currentStep]()
             // Reset global alpha
@@ -242,7 +245,61 @@ class Game {
             }
         }
 
+
     }
+
+    drawPossibleMoves()
+    {
+        for(const params of this.state.soldiers){
+            var soldier = new Soldier(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner, params.health, params.energy);
+            if(soldier.owner == this.player.number && soldier.selected && soldier.energy > 0){
+                let tilesAround = soldier.getTilesAround()
+
+                for (var tileKey of Object.keys(tilesAround)) {
+                    var tile = tilesAround[tileKey];
+        
+                    if(['top','right', 'bottom', 'left'].includes(tileKey) && tile && (tile.type == 'zone' || tile.type == 'door' || tile.type == 'floor')){
+        
+                        // Draw line around
+                        this.ctx.globalAlpha = 0.4;
+                        this.ctx.beginPath();
+                        this.ctx.lineWidth = "1";
+                        this.ctx.strokeStyle = this.state.CONSTANTS.POSSIBLE_MOVES_COLOR;
+                        this.ctx.rect(
+                            tile.x * tile.size + this.state.canvas.xOffset, // x
+                            tile.y * tile.size + this.state.canvas.yOffset, // y
+                            tile.size, // width
+                            tile.size // height
+                        ); 
+                        this.ctx.stroke();
+                        
+                        // Fill rectangle
+                        this.ctx.fillStyle = this.state.CONSTANTS.POSSIBLE_MOVES_COLOR;
+                        this.ctx.fillRect(
+                            tile.x * tile.size + this.state.canvas.xOffset, // x
+                            tile.y * tile.size + this.state.canvas.yOffset, // y
+                            tile.size, // width
+                            tile.size // height
+                        )
+        
+                        this.ctx.globalAlpha = 1;
+                        // // if clicked
+                        // if(tile.isClicked() && characterSelected.energy > 0){
+                        //     characterSelected.energy--;
+                        //     characterSelected.path.push(tile);
+                        //     state.mouseClicked = false;
+                        //     tile.walkable = false;
+                        //     tile.selected = true;
+                        // }
+        
+                    }
+                }
+            }
+
+        }
+
+    }
+
 
     doorsDrawing()
     {   

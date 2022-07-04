@@ -22,6 +22,7 @@ const CONSTANTS = {
     SOLDIER_HEALTH: 10,
     SOLDIER_ENERGY: 5,
     HOVER_BORDER_COLOR: 'purple',
+    POSSIBLE_MOVES_COLOR: 'purple',
 }
 
 module.exports = {

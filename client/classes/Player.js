@@ -57,7 +57,6 @@ class Player {
         for(var soldier of state.soldiers){
             if(soldier.x == hoveredTile.x && soldier.y == hoveredTile.y && soldier.owner == this.number){
                 return true;
-                break;
             }
         }
         return false;
@@ -68,7 +67,6 @@ class Player {
         for(var soldier of state.soldiers){
             if(soldier.x == hoveredTile.x && soldier.y == hoveredTile.y && soldier.owner == this.number){
                 return soldier;
-                break;
             }
         }
         return false;

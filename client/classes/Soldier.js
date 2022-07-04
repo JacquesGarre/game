@@ -12,6 +12,10 @@ class Soldier {
         this.sprite = this.sprites['soldier_idle_down_0'];
         this.health = health;
         this.energy = energy;
+        const index = this.state.soldiers.findIndex(char => {
+            return char.x == this.x && char.y == this.y && char.owner == this.owner;
+        });
+        this.selected = this.state.soldiers[index].selected !== undefined ? this.state.soldiers[index].selected : false;
     }
 
     draw()
@@ -27,6 +31,12 @@ class Soldier {
             this.x * this.size + this.state.canvas.xOffset,
             this.y * this.size + this.state.canvas.yOffset,
         )
+
+        // If selected, draw hover effect constantly
+        if(this.selected){
+            this.drawHoverEffect();
+        }
+        
     }
 
     drawBorders()

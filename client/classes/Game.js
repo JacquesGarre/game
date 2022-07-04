@@ -201,6 +201,7 @@ class Game {
 
     soldiersMoves()
     {   
+
         // If players presse a key, he finished his turn
         if(this.player.keydown){
             this.player.finishedMoves = true;
@@ -220,11 +221,23 @@ class Game {
                 var soldier = new Soldier(this.sprites, this.state, this.ctx, tileX, tileY, this.state.CONSTANTS.TILE_SIZE, this.player.number, params.health, params.energy);
                 soldier.drawHoverEffect();
 
+                // If player clicks on hovered soldier, draw the character as selected
                 if(this.player.mouseClicked !== false){
+                    // reset click
+                    this.player.mouseClicked = false;
+                    const index = this.state.soldiers.findIndex(char => {
+                        return char.x == soldier.x && char.y == soldier.y && char.owner == soldier.owner;
+                    });
 
+                    this.state.soldiers[index].selected = this.state.soldiers[index].selected !== undefined ? !this.state.soldiers[index].selected : true;
+                    // unselect all other characters
+                    for(const id of Object.keys(this.state.soldiers)){
+                        if(id != index && this.state.soldiers[id].owner == this.player.number){
+                            this.state.soldiers[id].selected = false;
+                        }
+                    }
 
                 }
-
 
             }
         }
@@ -379,6 +392,7 @@ class Game {
                             owner: this.player.number,
                             health: this.state.CONSTANTS.SOLDIER_HEALTH,
                             energy: this.state.CONSTANTS.SOLDIER_ENERGY,
+                            selected: false
                         });
 
                         // decrements player resources

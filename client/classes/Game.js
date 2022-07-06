@@ -34,6 +34,9 @@ class Game {
             },
             'fight': function(){
                 that.fight(); // a fight is happening
+            },
+            'fightAnimation': function(){
+                that.fightAnimation(); // fight combos are done
             }
         }
     }
@@ -84,8 +87,8 @@ class Game {
         }
 
         // Binds keypress
-        window.addEventListener("keydown", function(){
-            that.player.keydown = true
+        window.addEventListener("keydown", function(e){
+            that.player.keydown = e.code
         }, false);
         window.addEventListener("keyup", function(){
             that.player.keydown = false
@@ -214,8 +217,15 @@ class Game {
     fight()
     {   
 
-        var fight = new Fight(this.ctx, this.state, this.sprites, this.player)
+        var fight = new Fight(this.ctx, this.state, this.sprites, this.player, this.io, this.room.id)
         fight.start();
+        fight.recordCombo();
+    }
+
+    fightAnimation()
+    {
+        var fight = new Fight(this.ctx, this.state, this.sprites, this.player, this.io, this.room.id)
+        fight.animate();
     }
 
     soldiersAnimation()
@@ -238,7 +248,11 @@ class Game {
                     this.state.currentStep = 'fight';
                     this.state.fight = {
                         type: 'soldier_vs_soldier',
-                        who: [k, key]
+                        who: [k, key],
+                        combos: {
+                            0: [],
+                            1: []
+                        }
                     }
                     this.updateState(this.state);
                     this.io.emit("stateUpdated", this.room.id, this.state);
@@ -519,7 +533,8 @@ class Game {
                             health: this.state.CONSTANTS.SOLDIER_HEALTH,
                             energy: this.state.CONSTANTS.SOLDIER_ENERGY,
                             selected: false,
-                            path: []
+                            path: [],
+                            combo: []
                         });
 
                         // decrements player resources

@@ -25,7 +25,8 @@ const CONSTANTS = {
     POSSIBLE_MOVES_COLOR: 'purple',
     PATH_COLOR: 'red',
     WALKING_SPEED: 0.0001,
-    FRAME_RATE: 0.0025
+    FRAME_RATE: 0.0025,
+    FIGHT_COMBO_LENGTH: 10
 }
 
 module.exports = {

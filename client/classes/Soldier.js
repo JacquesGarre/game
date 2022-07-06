@@ -23,6 +23,7 @@ class Soldier {
         this.sprite = this.sprites['soldier_'+this.animation+'_'+this.direction+'_'+this.animationStep];
 
         this.nextPath = false;
+        this.combo = index >= 0 && this.state.soldiers[index].combo !== undefined ? this.state.soldiers[index].combo : [];
     }
 
     draw()

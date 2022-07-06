@@ -194,9 +194,12 @@ class Game {
     drawSoldiers()
     {
         for(const params of this.state.soldiers){
+            if(params == null){
+                continue;
+            }
             var soldier = new Soldier(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner, params.health, params.energy, this.player.number);
             soldier.draw();
-            if(soldier.owner == this.player.number){
+            if(this.state.currentStep == 'soldiersMoves' && soldier.owner == this.player.number){
                 soldier.drawPath();
             }
         }
@@ -223,9 +226,26 @@ class Game {
     }
 
     fightAnimation()
-    {
+    {   
+
+        if(this.state.soldiers[this.state.fight.who[0]].health == 0){
+            this.io.emit("stateUpdated", this.room.id, this.state);
+            return;
+        } 
+        if(this.state.soldiers[this.state.fight.who[1]].health == 0){
+            this.io.emit("stateUpdated", this.room.id, this.state);
+            return;
+        } 
+        
+        if(this.state.fight.combos[0].length == 0 && this.state.fight.combos[1].length == 0){
+            this.io.emit("stateUpdated", this.room.id, this.state);
+            return;
+        }
+
         var fight = new Fight(this.ctx, this.state, this.sprites, this.player, this.io, this.room.id)
         fight.animate();
+        
+
     }
 
     soldiersAnimation()

@@ -110,6 +110,8 @@ const SPRITES = {
     soldier_right_defend_low_1:'assets/map/fight/soldier_right/defend_1.png', 
     soldier_right_defend_low_2:'assets/map/fight/soldier_right/defend_low_2.png',
     soldier_right_defend_low_3:'assets/map/fight/soldier_right/defend_3.png',
+    combo_attack: 'assets/map/fight/attack.png',
+    combo_defend: 'assets/map/fight/defend.png',
     
 }
 

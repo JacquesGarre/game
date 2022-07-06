@@ -10,8 +10,8 @@ class State {
             height: CONSTANTS.CANVAS_HEIGHT, // pixels
             backgroundColor: CONSTANTS.CANVAS_DEFAULT_BG_COLOR,
             borderColor: CONSTANTS.CANVAS_DEFAULT_BORDER_COLOR,
-            xOffset: 300,
-            yOffset: 300
+            xOffset: 0,
+            yOffset: 0
         }
         this.map = {
             tilesX: CONSTANTS.MAP_TILES_X,

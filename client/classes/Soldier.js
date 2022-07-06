@@ -176,6 +176,7 @@ class Soldier {
 
     drawPath()
     {
+
         for(const tile of this.path){
 
             // Draw line around
@@ -203,6 +204,8 @@ class Soldier {
             this.ctx.globalAlpha = 1;
 
         }
+        
+
     }
 
     walkPath(key)
@@ -229,8 +232,8 @@ class Soldier {
                 this.animationStep = 0;
             }
             
-            // this.energy -= this.state.CONSTANTS.WALKING_SPEED;
-            // this.energy = this.energy.toFixed(2)
+            this.energy -= this.state.CONSTANTS.WALKING_SPEED;
+            this.energy = this.energy.toFixed(2)
         } else if (this.animation == 'idle') {
             this.animationStep = 0;
         }
@@ -243,8 +246,9 @@ class Soldier {
         this.state.soldiers[key].y = this.y;
 
         this.draw();
-
-
+        if(this.owner == this.currentPlayerNumber){
+            this.drawBars();
+        }
     }
     
     getNextPathDirection(key)

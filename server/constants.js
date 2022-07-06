@@ -11,10 +11,10 @@ const CONSTANTS = {
     TILE_BORDER_COLOR: 'red',
     PLAYERS_COUNT: 2,
     RESOURCES_PER_PLAYER: {
-        zones: 2,
-        doors: 1,
+        zones: 5,
+        doors: 3,
         kings: 1,
-        soldiers: 1
+        soldiers: 3
     },
     WALL_HEALTH: 3,
     DOOR_HEALTH: 2,
@@ -23,7 +23,9 @@ const CONSTANTS = {
     SOLDIER_ENERGY: 5,
     HOVER_BORDER_COLOR: 'purple',
     POSSIBLE_MOVES_COLOR: 'purple',
-    PATH_COLOR: 'red'
+    PATH_COLOR: 'red',
+    WALKING_SPEED: 0.0001,
+    FRAME_RATE: 0.0025
 }
 
 module.exports = {

@@ -31,6 +31,9 @@ class Game {
             },
             'soldiersAnimation': function(){
                 that.soldiersAnimation(); // soldiers will be animated
+            },
+            'fight': function(){
+                that.fight(); // a fight is happening
             }
         }
     }
@@ -208,9 +211,41 @@ class Game {
         }
     }
 
+    fight()
+    {   
+
+        var fight = new Fight(this.ctx, this.state, this.sprites, this.player)
+        fight.start();
+    }
+
     soldiersAnimation()
     {
-        console.log('ANIMATE!');
+        for(const key in this.state.soldiers){
+            const params = this.state.soldiers[key]
+            this.state.soldiers[key].selected = false;
+            var soldier = new Soldier(this.sprites, this.state, this.ctx, params.x, params.y, params.size, params.owner, params.health, params.energy, this.player.number);
+            if(soldier.path.length){
+                soldier.walkPath(key) 
+            }
+            // Is there another character on same tile?
+            for(const k in this.state.soldiers){
+                if(k == key || this.state.soldiers[k].owner == soldier.owner){
+                    continue;
+                }
+                var otherSoldier = this.state.soldiers[k]
+                if(Math.floor(otherSoldier.x) == Math.floor(soldier.x) && Math.floor(otherSoldier.y) == Math.floor(soldier.y)){
+                    alert(k + ' WILL FIGHT ' + key);
+                    this.state.currentStep = 'fight';
+                    this.state.fight = {
+                        type: 'soldier_vs_soldier',
+                        who: [k, key]
+                    }
+                    this.updateState(this.state);
+                    this.io.emit("stateUpdated", this.room.id, this.state);
+                }
+
+            }
+        }
     }
 
     soldiersMoves()

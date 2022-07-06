@@ -9,15 +9,20 @@ class Soldier {
         this.state = state;
         this.sprites = sprites;
         this.owner = playerNumber;
-        this.sprite = this.sprites['soldier_idle_down_0'];
         this.health = health;
-        this.energy = energy;
         this.currentPlayerNumber = currentPlayerNumber;
         const index = this.state.soldiers.findIndex(char => {
             return char.x == this.x && char.y == this.y && char.owner == this.owner;
         });
         this.selected = index >= 0 && this.state.soldiers[index].selected !== undefined ? this.state.soldiers[index].selected : false;
         this.path = index >= 0 ? this.state.soldiers[index].path : [];
+        this.animation = index >= 0 && this.state.soldiers[index].animation !== undefined ? this.state.soldiers[index].animation : 'idle';
+        this.direction = index >= 0 && this.state.soldiers[index].direction !== undefined ? this.state.soldiers[index].direction : 'down';
+        this.animationStep = index >= 0 && this.state.soldiers[index].animationStep ? this.state.soldiers[index].animationStep : 0;
+        this.energy = index >= 0 && this.state.soldiers[index].energy !== undefined ? this.state.soldiers[index].energy : energy;
+        this.sprite = this.sprites['soldier_'+this.animation+'_'+this.direction+'_'+this.animationStep];
+
+        this.nextPath = false;
     }
 
     draw()
@@ -28,6 +33,8 @@ class Soldier {
         }
 
         // Draw sprite
+        this.sprite = this.sprites['soldier_'+this.animation+'_'+this.direction+'_'+ Math.floor(this.animationStep)];
+
         this.ctx.drawImage(
             this.sprite, 
             this.x * this.size + this.state.canvas.xOffset,
@@ -195,6 +202,100 @@ class Soldier {
             this.ctx.globalAlpha = 1;
 
         }
+    }
+
+    walkPath(key)
+    {
+        [this.animation, this.direction] = this.getNextPathDirection(key);
+        if(this.animation == 'walk'){
+            switch(this.direction){
+                case 'right':
+                    this.x += this.state.CONSTANTS.WALKING_SPEED;
+                break;
+                case 'left':
+                    this.x -= this.state.CONSTANTS.WALKING_SPEED;
+                break;
+                case 'up':
+                    this.y -= this.state.CONSTANTS.WALKING_SPEED;
+                break;
+                case 'down':
+                    this.y += this.state.CONSTANTS.WALKING_SPEED;
+                break;
+            }
+            if(this.animationStep < (4 - this.state.CONSTANTS.FRAME_RATE)){
+                this.animationStep += this.state.CONSTANTS.FRAME_RATE;
+            } else {
+                this.animationStep = 0;
+            }
+            
+            // this.energy -= this.state.CONSTANTS.WALKING_SPEED;
+            // this.energy = this.energy.toFixed(2)
+        } else if (this.animation == 'idle') {
+            this.animationStep = 0;
+        }
+
+        this.state.soldiers[key].animation = this.animation;
+        this.state.soldiers[key].animationStep = this.animationStep;
+        this.state.soldiers[key].direction = this.direction;
+        this.state.soldiers[key].energy = this.energy;
+        this.state.soldiers[key].x = this.x;
+        this.state.soldiers[key].y = this.y;
+
+        this.draw();
+
+
+    }
+    
+    getNextPathDirection(key)
+    {
+
+        if(this.path[0] !== undefined){
+            this.nextPath = this.path[0];         
+
+            // right
+            if(this.x.toFixed(2) < (this.nextPath.x - this.state.CONSTANTS.WALKING_SPEED) && this.y.toFixed(2) == this.nextPath.y){
+                return [
+                    'walk',
+                    'right'
+                ]
+
+            // left
+            } else if(this.x.toFixed(2) > (this.nextPath.x + this.state.CONSTANTS.WALKING_SPEED) &&  this.y.toFixed(2) == this.nextPath.y){
+                return [
+                    'walk',
+                    'left'
+                ]
+            
+            // up
+            } else if(this.x.toFixed(2) == this.nextPath.x && this.y.toFixed(2) > (this.nextPath.y + this.state.CONSTANTS.WALKING_SPEED)){
+                return [
+                    'walk',
+                    'up'
+                ]
+
+            // down
+            } else if(this.x.toFixed(2) == this.nextPath.x && this.y.toFixed(2) < (this.nextPath.y - this.state.CONSTANTS.WALKING_SPEED)){
+                return [
+                    'walk',
+                    'down'
+                ];
+            } else {
+                this.path.shift();
+                this.state.soldiers[key].path = this.path;
+                return [
+                    this.animation, 
+                    this.direction
+                ] 
+            }           
+            
+
+        } 
+
+        return [
+            'idle',
+            'down'
+        ];
+        
     }
 
 }

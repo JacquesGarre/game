@@ -114,21 +114,20 @@ server.on("connection", (client) => {
     client.on("stateUpdated", (roomID, newState) => {
         newState = checkForNextGameStep(newState);
         state[roomID] = newState;
-
-        for(const playerID of Object.keys(newState.players)){
-            const player = newState.players[playerID];
-            if(player.finishedMoves == true){
-                console.log('a player has finished his moves', player)
-            }
-        }
-
         server.to(roomID).emit("updateState", state[roomID]);
     })
     
 });
 
 function checkForNextGameStep(newState)
-{
+{   
+    if(newState.currentStep == 'fight'){
+        console.log("\n\n\n\n\n\n\n\n\n\n")
+        console.log("CE STATE")
+        console.log(JSON.stringify(newState));
+        console.log("\n\n\n\n\n\n\n\n\n\n")
+        return newState;
+    }
 
     // test zoneDrawing
     for(const playerID of Object.keys(newState.players)){
@@ -177,11 +176,12 @@ function checkForNextGameStep(newState)
 
     newState.currentStep = 'soldiersAnimation';
 
-    console.log("\n\n\n\n\n\n\n\n\n\n")
-    console.log('NEW STATE!, CHARACTER ANIMATION!!!')
+    // console.log("\n\n\n\n\n\n\n\n\n\n")
+    // console.log('NEW STATE!, CHARACTER ANIMATION!!!')
 
-    //console.log(JSON.stringify(newState));
-    
+    // console.log(JSON.stringify(newState));
+
+    // ajouter = soldiersAnimation
 
     return newState;
 
@@ -219,28 +219,19 @@ function debug(){
                     "x": 0,
                     "y": 1,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_topLeft"
+                    "type": "floor"
                 },
                 {
                     "x": 0,
                     "y": 2,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_left"
+                    "type": "floor"
                 },
                 {
                     "x": 0,
                     "y": 3,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_bottomLeft"
+                    "type": "floor"
                 },
                 {
                     "x": 0,
@@ -278,21 +269,187 @@ function debug(){
                     "x": 1,
                     "y": 1,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_bottom"
+                    "type": "floor"
                 },
                 {
                     "x": 1,
                     "y": 2,
                     "size": 32,
-                    "type": "zone",
-                    "owner": 0
+                    "type": "floor"
                 },
                 {
                     "x": 1,
                     "y": 3,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 1,
+                    "y": 4,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 1,
+                    "y": 5,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 1,
+                    "y": 6,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 1,
+                    "y": 7,
+                    "size": 32,
+                    "type": "floor"
+                }
+            ],
+            [
+                {
+                    "x": 2,
+                    "y": 0,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 2,
+                    "y": 1,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 2,
+                    "y": 2,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 2,
+                    "y": 3,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 2,
+                    "y": 4,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 2,
+                    "y": 5,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 2,
+                    "y": 6,
+                    "size": 32,
+                    "type": "floor"
+                },
+                {
+                    "x": 2,
+                    "y": 7,
+                    "size": 32,
+                    "type": "floor"
+                }
+            ],
+            [
+                {
+                    "x": 3,
+                    "y": 0,
+                    "size": 32,
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_left"
+                },
+                {
+                    "x": 3,
+                    "y": 1,
+                    "size": 32,
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_left"
+                },
+                {
+                    "x": 3,
+                    "y": 2,
+                    "size": 32,
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_topLeft"
+                },
+                {
+                    "x": 3,
+                    "y": 3,
+                    "size": 32,
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_left"
+                },
+                {
+                    "x": 3,
+                    "y": 4,
+                    "size": 32,
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_topLeft"
+                },
+                {
+                    "x": 3,
+                    "y": 5,
+                    "size": 32,
+                    "type": "door",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_left"
+                },
+                {
+                    "x": 3,
+                    "y": 6,
+                    "size": 32,
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_topLeft"
+                },
+                {
+                    "x": 3,
+                    "y": 7,
+                    "size": 32,
+                    "type": "door",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_left"
+                }
+            ],
+            [
+                {
+                    "x": 4,
+                    "y": 0,
+                    "size": 32,
+                    "type": "zone",
+                    "owner": 0
+                },
+                {
+                    "x": 4,
+                    "y": 1,
+                    "size": 32,
+                    "type": "zone",
+                    "owner": 0
+                },
+                {
+                    "x": 4,
+                    "y": 2,
                     "size": 32,
                     "type": "wall",
                     "health": 3,
@@ -300,143 +457,39 @@ function debug(){
                     "sprite": "wall_top"
                 },
                 {
-                    "x": 1,
-                    "y": 4,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 1,
-                    "y": 5,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 1,
-                    "y": 6,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 1,
-                    "y": 7,
-                    "size": 32,
-                    "type": "floor"
-                }
-            ],
-            [
-                {
-                    "x": 2,
-                    "y": 0,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 2,
-                    "y": 1,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_topRight"
-                },
-                {
-                    "x": 2,
-                    "y": 2,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_right"
-                },
-                {
-                    "x": 2,
+                    "x": 4,
                     "y": 3,
                     "size": 32,
+                    "type": "zone",
+                    "owner": 0
+                },
+                {
+                    "x": 4,
+                    "y": 4,
+                    "size": 32,
                     "type": "wall",
                     "health": 3,
                     "owner": 0,
-                    "sprite": "wall_bottomRight"
+                    "sprite": "wall_top"
                 },
                 {
-                    "x": 2,
-                    "y": 4,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 2,
+                    "x": 4,
                     "y": 5,
                     "size": 32,
-                    "type": "floor"
+                    "type": "zone",
+                    "owner": 0
                 },
                 {
-                    "x": 2,
+                    "x": 4,
                     "y": 6,
                     "size": 32,
                     "type": "wall",
                     "health": 3,
                     "owner": 0,
-                    "sprite": "wall_topLeft"
+                    "sprite": "wall_top"
                 },
                 {
-                    "x": 2,
-                    "y": 7,
-                    "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_left"
-                }
-            ],
-            [
-                {
-                    "x": 3,
-                    "y": 0,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 3,
-                    "y": 1,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 3,
-                    "y": 2,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 3,
-                    "y": 3,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 3,
-                    "y": 4,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 3,
-                    "y": 5,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 3,
-                    "y": 6,
-                    "size": 32,
-                    "type": "door",
-                    "health": 3,
-                    "owner": 0,
-                    "sprite": "wall_bottom"
-                },
-                {
-                    "x": 3,
+                    "x": 4,
                     "y": 7,
                     "size": 32,
                     "type": "zone",
@@ -445,43 +498,61 @@ function debug(){
             ],
             [
                 {
-                    "x": 4,
+                    "x": 5,
                     "y": 0,
                     "size": 32,
-                    "type": "floor"
+                    "type": "door",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_right"
                 },
                 {
-                    "x": 4,
+                    "x": 5,
                     "y": 1,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_right"
                 },
                 {
-                    "x": 4,
+                    "x": 5,
                     "y": 2,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_topRight"
                 },
                 {
-                    "x": 4,
+                    "x": 5,
                     "y": 3,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_right"
                 },
                 {
-                    "x": 4,
+                    "x": 5,
                     "y": 4,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_topRight"
                 },
                 {
-                    "x": 4,
+                    "x": 5,
                     "y": 5,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 0,
+                    "sprite": "wall_right"
                 },
                 {
-                    "x": 4,
+                    "x": 5,
                     "y": 6,
                     "size": 32,
                     "type": "wall",
@@ -490,7 +561,7 @@ function debug(){
                     "sprite": "wall_topRight"
                 },
                 {
-                    "x": 4,
+                    "x": 5,
                     "y": 7,
                     "size": 32,
                     "type": "wall",
@@ -501,56 +572,6 @@ function debug(){
             ],
             [
                 {
-                    "x": 5,
-                    "y": 0,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 5,
-                    "y": 1,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 5,
-                    "y": 2,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 5,
-                    "y": 3,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 5,
-                    "y": 4,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 5,
-                    "y": 5,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 5,
-                    "y": 6,
-                    "size": 32,
-                    "type": "floor"
-                },
-                {
-                    "x": 5,
-                    "y": 7,
-                    "size": 32,
-                    "type": "floor"
-                }
-            ],
-            [
-                {
                     "x": 6,
                     "y": 0,
                     "size": 32,
@@ -604,37 +625,55 @@ function debug(){
                     "x": 7,
                     "y": 0,
                     "size": 32,
-                    "type": "floor"
+                    "type": "door",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_left"
                 },
                 {
                     "x": 7,
                     "y": 1,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_left"
                 },
                 {
                     "x": 7,
                     "y": 2,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_topLeft"
                 },
                 {
                     "x": 7,
                     "y": 3,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_left"
                 },
                 {
                     "x": 7,
                     "y": 4,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_topLeft"
                 },
                 {
                     "x": 7,
                     "y": 5,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_left"
                 },
                 {
                     "x": 7,
@@ -660,46 +699,56 @@ function debug(){
                     "x": 8,
                     "y": 0,
                     "size": 32,
-                    "type": "floor"
+                    "type": "zone",
+                    "owner": 1
                 },
                 {
                     "x": 8,
                     "y": 1,
                     "size": 32,
-                    "type": "floor"
+                    "type": "zone",
+                    "owner": 1
                 },
                 {
                     "x": 8,
                     "y": 2,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_top"
                 },
                 {
                     "x": 8,
                     "y": 3,
                     "size": 32,
-                    "type": "floor"
+                    "type": "zone",
+                    "owner": 1
                 },
                 {
                     "x": 8,
                     "y": 4,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_top"
                 },
                 {
                     "x": 8,
                     "y": 5,
                     "size": 32,
-                    "type": "floor"
+                    "type": "zone",
+                    "owner": 1
                 },
                 {
                     "x": 8,
                     "y": 6,
                     "size": 32,
-                    "type": "door",
+                    "type": "wall",
                     "health": 3,
                     "owner": 1,
-                    "sprite": "wall_bottom"
+                    "sprite": "wall_top"
                 },
                 {
                     "x": 8,
@@ -717,16 +766,16 @@ function debug(){
                     "type": "wall",
                     "health": 3,
                     "owner": 1,
-                    "sprite": "wall_topLeft"
+                    "sprite": "wall_right"
                 },
                 {
                     "x": 9,
                     "y": 1,
                     "size": 32,
-                    "type": "wall",
+                    "type": "door",
                     "health": 3,
                     "owner": 1,
-                    "sprite": "wall_left"
+                    "sprite": "wall_right"
                 },
                 {
                     "x": 9,
@@ -735,25 +784,34 @@ function debug(){
                     "type": "wall",
                     "health": 3,
                     "owner": 1,
-                    "sprite": "wall_bottomLeft"
+                    "sprite": "wall_topRight"
                 },
                 {
                     "x": 9,
                     "y": 3,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_right"
                 },
                 {
                     "x": 9,
                     "y": 4,
                     "size": 32,
-                    "type": "floor"
+                    "type": "wall",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_topRight"
                 },
                 {
                     "x": 9,
                     "y": 5,
                     "size": 32,
-                    "type": "floor"
+                    "type": "door",
+                    "health": 3,
+                    "owner": 1,
+                    "sprite": "wall_right"
                 },
                 {
                     "x": 9,
@@ -779,26 +837,19 @@ function debug(){
                     "x": 10,
                     "y": 0,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_bottom"
+                    "type": "floor"
                 },
                 {
                     "x": 10,
                     "y": 1,
                     "size": 32,
-                    "type": "zone",
-                    "owner": 1
+                    "type": "floor"
                 },
                 {
                     "x": 10,
                     "y": 2,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_top"
+                    "type": "floor"
                 },
                 {
                     "x": 10,
@@ -836,28 +887,19 @@ function debug(){
                     "x": 11,
                     "y": 0,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_topRight"
+                    "type": "floor"
                 },
                 {
                     "x": 11,
                     "y": 1,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_right"
+                    "type": "floor"
                 },
                 {
                     "x": 11,
                     "y": 2,
                     "size": 32,
-                    "type": "wall",
-                    "health": 3,
-                    "owner": 1,
-                    "sprite": "wall_bottomRight"
+                    "type": "floor"
                 },
                 {
                     "x": 11,
@@ -904,10 +946,10 @@ function debug(){
             "TILE_BORDER_COLOR": "red",
             "PLAYERS_COUNT": 2,
             "RESOURCES_PER_PLAYER": {
-                "zones": 2,
-                "doors": 1,
+                "zones": 5,
+                "doors": 3,
                 "kings": 1,
-                "soldiers": 1
+                "soldiers": 3
             },
             "WALL_HEALTH": 3,
             "DOOR_HEALTH": 2,
@@ -916,7 +958,9 @@ function debug(){
             "SOLDIER_ENERGY": 5,
             "HOVER_BORDER_COLOR": "purple",
             "POSSIBLE_MOVES_COLOR": "purple",
-            "PATH_COLOR": "red"
+            "PATH_COLOR": "red",
+            "WALKING_SPEED": 0.0001,
+            "FRAME_RATE": 0.0025
         },
         "SPRITES": {
             "floor_topLeft": "assets/map/floor/top-left.png",
@@ -970,14 +1014,72 @@ function debug(){
             "soldier_idle_down_1": "assets/map/characters/soldier/idle_down_1.png",
             "soldier_idle_down_2": "assets/map/characters/soldier/idle_down_2.png",
             "soldier_idle_down_3": "assets/map/characters/soldier/idle_down_3.png",
-            "king": "assets/map/characters/king/king.png"
+            "king": "assets/map/characters/king/king.png",
+            "soldier_vs_soldier_background": "assets/map/fight/fight_background.png",
+            "soldier_left_idle_0":"assets/map/fight/soldier_left/idle_0.png", 
+            "soldier_left_idle_1":"assets/map/fight/soldier_left/idle_1.png", 
+            "soldier_left_idle_2":"assets/map/fight/soldier_left/idle_2.png", 
+            "soldier_left_idle_3":"assets/map/fight/soldier_left/idle_3.png", 
+            "soldier_left_attack_high_0":"assets/map/fight/soldier_left/attack_0.png", 
+            "soldier_left_attack_high_1":"assets/map/fight/soldier_left/attack_1.png", 
+            "soldier_left_attack_high_2":"assets/map/fight/soldier_left/attack_high_2.png", 
+            "soldier_left_attack_high_3":"assets/map/fight/soldier_left/attack_3.png", 
+            "soldier_left_attack_low_0":"assets/map/fight/soldier_left/attack_0.png", 
+            "soldier_left_attack_low_1":"assets/map/fight/soldier_left/attack_1.png", 
+            "soldier_left_attack_low_2":"assets/map/fight/soldier_left/attack_low_2.png", 
+            "soldier_left_attack_low_3":"assets/map/fight/soldier_left/attack_3.png", 
+            "soldier_left_attack_medium_0":"assets/map/fight/soldier_left/attack_0.png", 
+            "soldier_left_attack_medium_1":"assets/map/fight/soldier_left/attack_1.png", 
+            "soldier_left_attack_medium_2":"assets/map/fight/soldier_left/attack_medium_2.png", 
+            "soldier_left_attack_medium_3":"assets/map/fight/soldier_left/attack_3.png", 
+            "soldier_left_defend_high_0":"assets/map/fight/soldier_left/defend_0.png", 
+            "soldier_left_defend_high_1":"assets/map/fight/soldier_left/defend_1.png", 
+            "soldier_left_defend_high_2":"assets/map/fight/soldier_left/defend_high_2.png",
+            "soldier_left_defend_high_3":"assets/map/fight/soldier_left/defend_3.png", 
+            "soldier_left_defend_medium_0":"assets/map/fight/soldier_left/defend_0.png", 
+            "soldier_left_defend_medium_1":"assets/map/fight/soldier_left/defend_1.png", 
+            "soldier_left_defend_medium_2":"assets/map/fight/soldier_left/defend_medium_2.png",
+            "soldier_left_defend_medium_3":"assets/map/fight/soldier_left/defend_3.png",
+            "soldier_left_defend_low_0":"assets/map/fight/soldier_left/defend_0.png", 
+            "soldier_left_defend_low_1":"assets/map/fight/soldier_left/defend_1.png", 
+            "soldier_left_defend_low_2":"assets/map/fight/soldier_left/defend_low_2.png",
+            "soldier_left_defend_low_3":"assets/map/fight/soldier_left/defend_3.png",
+
+            "soldier_right_idle_0":"assets/map/fight/soldier_right/idle_0.png", 
+            "soldier_right_idle_1":"assets/map/fight/soldier_right/idle_1.png", 
+            "soldier_right_idle_2":"assets/map/fight/soldier_right/idle_2.png", 
+            "soldier_right_idle_3":"assets/map/fight/soldier_right/idle_3.png", 
+            "soldier_right_attack_high_0":"assets/map/fight/soldier_right/attack_0.png", 
+            "soldier_right_attack_high_1":"assets/map/fight/soldier_right/attack_1.png", 
+            "soldier_right_attack_high_2":"assets/map/fight/soldier_right/attack_high_2.png", 
+            "soldier_right_attack_high_3":"assets/map/fight/soldier_right/attack_3.png", 
+            "soldier_right_attack_low_0":"assets/map/fight/soldier_right/attack_0.png", 
+            "soldier_right_attack_low_1":"assets/map/fight/soldier_right/attack_1.png", 
+            "soldier_right_attack_low_2":"assets/map/fight/soldier_right/attack_low_2.png", 
+            "soldier_right_attack_low_3":"assets/map/fight/soldier_right/attack_3.png", 
+            "soldier_right_attack_medium_0":"assets/map/fight/soldier_right/attack_0.png", 
+            "soldier_right_attack_medium_1":"assets/map/fight/soldier_right/attack_1.png", 
+            "soldier_right_attack_medium_2":"assets/map/fight/soldier_right/attack_medium_2.png", 
+            "soldier_right_attack_medium_3":"assets/map/fight/soldier_right/attack_3.png", 
+            "soldier_right_defend_high_0":"assets/map/fight/soldier_right/defend_0.png", 
+            "soldier_right_defend_high_1":"assets/map/fight/soldier_right/defend_1.png", 
+            "soldier_right_defend_high_2":"assets/map/fight/soldier_right/defend_high_2.png",
+            "soldier_right_defend_high_3":"assets/map/fight/soldier_right/defend_3.png", 
+            "soldier_right_defend_medium_0":"assets/map/fight/soldier_right/defend_0.png", 
+            "soldier_right_defend_medium_1":"assets/map/fight/soldier_right/defend_1.png", 
+            "soldier_right_defend_medium_2":"assets/map/fight/soldier_right/defend_medium_2.png",
+            "soldier_right_defend_medium_3":"assets/map/fight/soldier_right/defend_3.png",
+            "soldier_right_defend_low_0":"assets/map/fight/soldier_right/defend_0.png", 
+            "soldier_right_defend_low_1":"assets/map/fight/soldier_right/defend_1.png", 
+            "soldier_right_defend_low_2":"assets/map/fight/soldier_right/defend_low_2.png",
+            "soldier_right_defend_low_3":"assets/map/fight/soldier_right/defend_3.png",
         },
         "playersLoaded": [],
-        "currentStep": "soldiersAnimation",
+        "currentStep": "fight",
         "players": {
             "0": {
                 "number": 0,
-                "pseudo": "sacascasc",
+                "pseudo": "asccas",
                 "resources": {
                     "zones": 0,
                     "doors": 0,
@@ -988,7 +1090,7 @@ function debug(){
             },
             "1": {
                 "number": 1,
-                "pseudo": "ascascasc",
+                "pseudo": "sadasc",
                 "resources": {
                     "zones": 0,
                     "doors": 0,
@@ -1000,8 +1102,20 @@ function debug(){
         },
         "zones": [
             {
-                "x": 10,
+                "x": 8,
                 "y": 1,
+                "size": 32,
+                "owner": 1
+            },
+            {
+                "x": 8,
+                "y": 3,
+                "size": 32,
+                "owner": 1
+            },
+            {
+                "x": 8,
+                "y": 5,
                 "size": 32,
                 "owner": 1
             },
@@ -1012,13 +1126,37 @@ function debug(){
                 "owner": 1
             },
             {
-                "x": 1,
-                "y": 2,
+                "x": 8,
+                "y": 0,
+                "size": 32,
+                "owner": 1
+            },
+            {
+                "x": 4,
+                "y": 0,
                 "size": 32,
                 "owner": 0
             },
             {
-                "x": 3,
+                "x": 4,
+                "y": 1,
+                "size": 32,
+                "owner": 0
+            },
+            {
+                "x": 4,
+                "y": 3,
+                "size": 32,
+                "owner": 0
+            },
+            {
+                "x": 4,
+                "y": 5,
+                "size": 32,
+                "owner": 0
+            },
+            {
+                "x": 4,
                 "y": 7,
                 "size": 32,
                 "owner": 0
@@ -1032,20 +1170,11 @@ function debug(){
                 "type": "wall",
                 "health": 3,
                 "owner": 1,
-                "sprite": "wall_topLeft"
+                "sprite": "wall_right"
             },
             {
-                "x": 10,
-                "y": 0,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 1,
-                "sprite": "wall_bottom"
-            },
-            {
-                "x": 11,
-                "y": 0,
+                "x": 9,
+                "y": 2,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1053,25 +1182,7 @@ function debug(){
                 "sprite": "wall_topRight"
             },
             {
-                "x": 11,
-                "y": 1,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 1,
-                "sprite": "wall_right"
-            },
-            {
-                "x": 11,
-                "y": 2,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 1,
-                "sprite": "wall_bottomRight"
-            },
-            {
-                "x": 10,
+                "x": 8,
                 "y": 2,
                 "size": 32,
                 "type": "wall",
@@ -1080,16 +1191,16 @@ function debug(){
                 "sprite": "wall_top"
             },
             {
-                "x": 9,
+                "x": 7,
                 "y": 2,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
                 "owner": 1,
-                "sprite": "wall_bottomLeft"
+                "sprite": "wall_topLeft"
             },
             {
-                "x": 9,
+                "x": 7,
                 "y": 1,
                 "size": 32,
                 "type": "wall",
@@ -1098,26 +1209,8 @@ function debug(){
                 "sprite": "wall_left"
             },
             {
-                "x": 7,
-                "y": 6,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 1,
-                "sprite": "wall_topLeft"
-            },
-            {
                 "x": 9,
-                "y": 6,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 1,
-                "sprite": "wall_topRight"
-            },
-            {
-                "x": 9,
-                "y": 7,
+                "y": 3,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
@@ -1125,152 +1218,301 @@ function debug(){
                 "sprite": "wall_right"
             },
             {
-                "x": 7,
-                "y": 7,
+                "x": 9,
+                "y": 4,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
                 "owner": 1,
-                "sprite": "wall_left"
-            },
-            {
-                "x": 0,
-                "y": 1,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
-                "sprite": "wall_topLeft"
-            },
-            {
-                "x": 1,
-                "y": 1,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
-                "sprite": "wall_bottom"
-            },
-            {
-                "x": 2,
-                "y": 1,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
                 "sprite": "wall_topRight"
             },
             {
-                "x": 2,
-                "y": 2,
+                "x": 8,
+                "y": 4,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
-                "owner": 0,
-                "sprite": "wall_right"
-            },
-            {
-                "x": 2,
-                "y": 3,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
-                "sprite": "wall_bottomRight"
-            },
-            {
-                "x": 1,
-                "y": 3,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
+                "owner": 1,
                 "sprite": "wall_top"
             },
             {
-                "x": 0,
+                "x": 7,
+                "y": 4,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 1,
+                "sprite": "wall_topLeft"
+            },
+            {
+                "x": 7,
                 "y": 3,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
-                "owner": 0,
-                "sprite": "wall_bottomLeft"
-            },
-            {
-                "x": 0,
-                "y": 2,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
+                "owner": 1,
                 "sprite": "wall_left"
             },
             {
-                "x": 2,
+                "x": 9,
                 "y": 6,
                 "size": 32,
                 "type": "wall",
                 "health": 3,
-                "owner": 0,
-                "sprite": "wall_topLeft"
-            },
-            {
-                "x": 4,
-                "y": 6,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
+                "owner": 1,
                 "sprite": "wall_topRight"
-            },
-            {
-                "x": 4,
-                "y": 7,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
-                "sprite": "wall_right"
-            },
-            {
-                "x": 2,
-                "y": 7,
-                "size": 32,
-                "type": "wall",
-                "health": 3,
-                "owner": 0,
-                "sprite": "wall_left"
-            }
-        ],
-        "doors": [
-            {
-                "x": 3,
-                "y": 6,
-                "size": 32,
-                "owner": 0,
-                "sprite": "door_bottom",
-                "health": 2
             },
             {
                 "x": 8,
                 "y": 6,
                 "size": 32,
+                "type": "wall",
+                "health": 3,
                 "owner": 1,
-                "sprite": "door_bottom",
+                "sprite": "wall_top"
+            },
+            {
+                "x": 7,
+                "y": 6,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 1,
+                "sprite": "wall_topLeft"
+            },
+            {
+                "x": 7,
+                "y": 5,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 1,
+                "sprite": "wall_left"
+            },
+            {
+                "x": 9,
+                "y": 7,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 1,
+                "sprite": "wall_right"
+            },
+            {
+                "x": 7,
+                "y": 7,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 1,
+                "sprite": "wall_left"
+            },
+            {
+                "x": 5,
+                "y": 1,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_right"
+            },
+            {
+                "x": 3,
+                "y": 1,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_left"
+            },
+            {
+                "x": 3,
+                "y": 0,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_left"
+            },
+            {
+                "x": 5,
+                "y": 2,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_topRight"
+            },
+            {
+                "x": 4,
+                "y": 2,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_top"
+            },
+            {
+                "x": 3,
+                "y": 2,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_topLeft"
+            },
+            {
+                "x": 5,
+                "y": 3,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_right"
+            },
+            {
+                "x": 5,
+                "y": 4,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_topRight"
+            },
+            {
+                "x": 4,
+                "y": 4,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_top"
+            },
+            {
+                "x": 3,
+                "y": 4,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_topLeft"
+            },
+            {
+                "x": 3,
+                "y": 3,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_left"
+            },
+            {
+                "x": 5,
+                "y": 5,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_right"
+            },
+            {
+                "x": 5,
+                "y": 6,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_topRight"
+            },
+            {
+                "x": 4,
+                "y": 6,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_top"
+            },
+            {
+                "x": 3,
+                "y": 6,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_topLeft"
+            },
+            {
+                "x": 5,
+                "y": 7,
+                "size": 32,
+                "type": "wall",
+                "health": 3,
+                "owner": 0,
+                "sprite": "wall_right"
+            }
+        ],
+        "doors": [
+            {
+                "x": 3,
+                "y": 7,
+                "size": 32,
+                "owner": 0,
+                "sprite": "door_left",
+                "health": 2
+            },
+            {
+                "x": 3,
+                "y": 5,
+                "size": 32,
+                "owner": 0,
+                "sprite": "door_left",
+                "health": 2
+            },
+            {
+                "x": 5,
+                "y": 0,
+                "size": 32,
+                "owner": 0,
+                "sprite": "door_right",
+                "health": 2
+            },
+            {
+                "x": 7,
+                "y": 0,
+                "size": 32,
+                "owner": 1,
+                "sprite": "door_left",
+                "health": 2
+            },
+            {
+                "x": 9,
+                "y": 1,
+                "size": 32,
+                "owner": 1,
+                "sprite": "door_right",
+                "health": 2
+            },
+            {
+                "x": 9,
+                "y": 5,
+                "size": 32,
+                "owner": 1,
+                "sprite": "door_right",
                 "health": 2
             }
         ],
         "kings": [
             {
-                "x": 1,
-                "y": 2,
+                "x": 4,
+                "y": 3,
                 "size": 32,
                 "owner": 0,
                 "health": 30
             },
             {
-                "x": 10,
-                "y": 1,
+                "x": 8,
+                "y": 3,
                 "size": 32,
                 "owner": 1,
                 "health": 30
@@ -1278,93 +1520,209 @@ function debug(){
         ],
         "soldiers": [
             {
-                "x": 8,
-                "y": 7,
+                "x": 5.999900000004661,
+                "y": 0,
                 "size": 32,
                 "owner": 1,
                 "health": 10,
                 "energy": 0,
-                "selected": true,
+                "selected": false,
                 "path": [
                     {
-                        "x": 8,
-                        "y": 6,
+                        "x": 5,
+                        "y": 0,
                         "size": 32,
                         "type": "door",
                         "health": 3,
-                        "owner": 1,
-                        "sprite": "wall_bottom"
+                        "owner": 0,
+                        "sprite": "wall_right"
                     },
                     {
-                        "x": 8,
-                        "y": 5,
+                        "x": 4,
+                        "y": 0,
+                        "size": 32,
+                        "type": "zone",
+                        "owner": 0
+                    },
+                    {
+                        "x": 4,
+                        "y": 1,
+                        "size": 32,
+                        "type": "zone",
+                        "owner": 0
+                    }
+                ],
+                "animation": "walk",
+                "animationStep": 1.972499999999969,
+                "direction": "left"
+            },
+            {
+                "x": 10.000099999995339,
+                "y": 1,
+                "size": 32,
+                "owner": 1,
+                "health": 10,
+                "energy": 0,
+                "selected": false,
+                "path": [
+                    {
+                        "x": 11,
+                        "y": 1,
                         "size": 32,
                         "type": "floor"
                     },
                     {
-                        "x": 8,
+                        "x": 11,
+                        "y": 2,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 11,
+                        "y": 3,
+                        "size": 32,
+                        "type": "floor"
+                    }
+                ],
+                "animation": "walk",
+                "animationStep": 1.972499999999969,
+                "direction": "right"
+            },
+            {
+                "x": 9.99519999999535,
+                "y": 4.995100000000011,
+                "size": 32,
+                "owner": 1,
+                "health": 10,
+                "energy": 0,
+                "selected": false,
+                "path": [
+                    {
+                        "x": 10,
                         "y": 4,
                         "size": 32,
                         "type": "floor"
                     },
                     {
-                        "x": 7,
-                        "y": 4,
+                        "x": 10,
+                        "y": 3,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 10,
+                        "y": 2,
+                        "size": 32,
+                        "type": "floor"
+                    }
+                ],
+                "animation": "walk",
+                "animationStep": 1.972499999999969,
+                "direction": "up"
+            },
+            {
+                "x": 5.99519999999535,
+                "y": 0.0049,
+                "size": 32,
+                "owner": 0,
+                "health": 10,
+                "energy": 0,
+                "selected": false,
+                "path": [
+                    {
+                        "x": 6,
+                        "y": 1,
                         "size": 32,
                         "type": "floor"
                     },
                     {
                         "x": 6,
-                        "y": 4,
+                        "y": 2,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 6,
+                        "y": 3,
                         "size": 32,
                         "type": "floor"
                     }
-                ]
+                ],
+                "animation": "walk",
+                "animationStep": 1.972499999999969,
+                "direction": "down"
             },
             {
-                "x": 3,
+                "x": 2.0048999999957897,
+                "y": 4.995100000000011,
+                "size": 32,
+                "owner": 0,
+                "health": 10,
+                "energy": 0,
+                "selected": false,
+                "path": [
+                    {
+                        "x": 2,
+                        "y": 4,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 2,
+                        "y": 3,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 2,
+                        "y": 2,
+                        "size": 32,
+                        "type": "floor"
+                    }
+                ],
+                "animation": "walk",
+                "animationStep": 1.969999999999969,
+                "direction": "up"
+            },
+            {
+                "x": 1.9999999999957796,
                 "y": 7,
                 "size": 32,
                 "owner": 0,
                 "health": 10,
                 "energy": 0,
-                "selected": true,
+                "selected": false,
                 "path": [
                     {
-                        "x": 3,
+                        "x": 1,
+                        "y": 7,
+                        "size": 32,
+                        "type": "floor"
+                    },
+                    {
+                        "x": 1,
                         "y": 6,
                         "size": 32,
-                        "type": "door",
-                        "health": 3,
-                        "owner": 0,
-                        "sprite": "wall_bottom"
+                        "type": "floor"
                     },
                     {
-                        "x": 3,
+                        "x": 1,
                         "y": 5,
-                        "size": 32,
-                        "type": "floor"
-                    },
-                    {
-                        "x": 4,
-                        "y": 5,
-                        "size": 32,
-                        "type": "floor"
-                    },
-                    {
-                        "x": 4,
-                        "y": 4,
-                        "size": 32,
-                        "type": "floor"
-                    },
-                    {
-                        "x": 5,
-                        "y": 4,
                         "size": 32,
                         "type": "floor"
                     }
-                ]
+                ],
+                "animation": "walk",
+                "animationStep": 1.969999999999969,
+                "direction": "left"
             }
-        ]
+        ],
+        "fight": {
+            "type": "soldier_vs_soldier",
+            "who": [
+                "0",
+                "3"
+            ]
+        }
     }
 }

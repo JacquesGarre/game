@@ -96,28 +96,28 @@ class Game {
 
         // Game loop animation
         var loop = setInterval(function(){
-            // Animate
-            //window.requestAnimationFrame(animate)
             // Clear screen
             that.clear()
             // Always update mouse position
             that.updateMousePosition()
             // Draws grey rectangle on back of canvas
-            that.drawBackground();            
-            // Draws tiles
-            that.drawFloor();
-            // Draws zones
-            that.drawZones();
-            // Draws walls
-            that.drawWalls();
-            // Draws doors
-            that.drawDoors();
-            // Draws kings
-            that.drawKings();
-            // Draws soldiers
-            that.drawSoldiers();
-            // Draw possible moves if a soldier is selected
-            that.drawPossibleMoves();
+            if(!['fightAnimation', 'fight'].includes(that.state.currentStep)){
+                that.drawBackground();            
+                // Draws tiles
+                that.drawFloor();
+                // Draws zones
+                that.drawZones();
+                // Draws walls
+                that.drawWalls();
+                // Draws doors
+                that.drawDoors();
+                // Draws kings
+                that.drawKings();
+                // Draws soldiers
+                that.drawSoldiers();
+                // Draw possible moves if a soldier is selected
+                that.drawPossibleMoves();
+            }
 
             // Play current step
             that.steps[that.state.currentStep]()
@@ -227,11 +227,11 @@ class Game {
     fightAnimation()
     {   
 
-        if(this.state.soldiers[this.state.fight.who[0]].health == 0){
+        if(this.state.soldiers[this.state.fight.who[0]] == undefined || this.state.soldiers[this.state.fight.who[0]].health == 0){
             this.io.emit("stateUpdated", this.room.id, this.state);
             return;
         } 
-        if(this.state.soldiers[this.state.fight.who[1]].health == 0){
+        if(this.state.soldiers[this.state.fight.who[1]] == undefined || this.state.soldiers[this.state.fight.who[1]].health == 0){
             this.io.emit("stateUpdated", this.room.id, this.state);
             return;
         } 

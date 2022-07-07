@@ -544,6 +544,10 @@ class Fight {
             this.state.fight.combos[1].shift()
         }
 
+        if(this.state.fight.combos[0].length == 0 || this.state.fight.combos[1].length == 0){
+            return;
+        }
+
         let leftFighterMove = this.state.fight.combos[0][0]
         var leftFighterSprite = this.sprites['soldier_left_'+leftFighterMove.fightAnimation+leftFighterMove.hitHeight+leftFighterMove.defendHeight+'_'+Math.floor(this.animationStep)]
 

@@ -125,18 +125,23 @@ function checkForNextGameStep(newState)
     // Combos are animated
     if(newState.currentStep == 'fightAnimation'){
 
+        if(newState.fight == {}){
+            newState.currentStep = 'soldiersAnimation';
+            return newState;
+        }
+
         // Check if one of the fighters is dead, if so delete him and go back to animation stage
         // Else keep fighting
         for(const id of Object.keys(newState.fight.who)){
-            if(newState.soldiers[id].health == 0){
+            if(newState.soldiers[id].health == 0 || newState.soldiers[id] == undefined){
                 delete newState.soldiers[id];
+                newState.fight = {}
                 newState.currentStep = 'soldiersAnimation';
                 console.log(newState.fight.who[id] + ' DIED! BACK TO ANIMATION!')
                 break;
             }
         } 
         newState.currentStep = 'fight';
-        console.log('NOBODY DIED, KEEP FIGHTING!')
         return newState;
     }
 

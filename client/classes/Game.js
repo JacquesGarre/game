@@ -95,9 +95,9 @@ class Game {
         }, false);
 
         // Game loop animation
-        function animate(){
+        var loop = setInterval(function(){
             // Animate
-            window.requestAnimationFrame(animate)
+            //window.requestAnimationFrame(animate)
             // Clear screen
             that.clear()
             // Always update mouse position
@@ -123,8 +123,7 @@ class Game {
             that.steps[that.state.currentStep]()
             // Reset global alpha
             that.ctx.globalAlpha = 1; 
-        }
-        animate();
+        }, 1000 / this.state.CONSTANTS.FPS)
     }
 
     clear() {

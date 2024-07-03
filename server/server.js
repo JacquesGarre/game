@@ -5,7 +5,7 @@ const { CONSTANTS } = require('./constants');
 const { State } = require('./classes/State.js');
 const server = new Server({ 
     cors: {
-        origin: "http://127.0.0.1:8080"
+        origin: "http://localhost:8080"
     }
 });
 
